@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - Chau7 Noël 🎄</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="h-full flex flex-col bg-slate-950">
+    <header class="bg-slate-900 border-b-2 border-xmasGold p-4 flex justify-between items-center">
+        <h1 class="text-xl font-black text-xmasGold">Mon Profil 🎁</h1>
+        <button onclick="window.location.href='calendar.html'" class="btn-xmas-gold text-xs px-4 py-2 rounded-xl">Calendrier</button>
+    </header>
+    <main class="flex-1 overflow-y-auto p-4 space-y-4">
+        <div id="profile-card" class="card-festive rounded-2xl p-6 border-2 border-xmasGold space-y-4">
+            <h2 class="text-lg font-bold text-xmasGold" id="profile-pseudo">Chargement...</h2>
+            <p class="text-xs text-slate-300" id="profile-email">...</p>
+            <div class="grid grid-cols-2 gap-2 text-center">
+                <div class="bg-slate-950 p-3 rounded-xl border border-xmasGold">
+                    <span class="text-xs text-slate-400 block">Points</span>
+                    <span class="text-xl font-black text-xmasGold" id="profile-points">0</span>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-xl border border-xmasGold">
+                    <span class="text-xs text-slate-400 block">Classement</span>
+                    <span class="text-xl font-black text-xmasGreen" id="profile-rank">Non classé</span>
+                </div>
+            </div>
+            <button onclick="handleLogout()" class="w-full bg-red-950 border border-red-600 text-red-200 py-2 rounded-xl text-xs font-bold">Se déconnecter</button>
+        </div>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -18,7 +18,6 @@
             border-right: 10px solid #f5b041;
         }
         
-        
 
         body.open-curtains .curtain { transform: scaleX(0); }
 
@@ -53,7 +52,7 @@
         document.getElementById('loading-sentence').textContent = sentences[Math.floor(Math.random() * sentences.length)];
         let progress = 0;
         const timer = setInterval(() => {
-            progress += 1;
+            progress += 2;
             document.getElementById('progress-fill').style.width = progress + '%';
             if (progress >= 100) {
                 clearInterval(timer);

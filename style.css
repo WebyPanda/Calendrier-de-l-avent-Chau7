@@ -1,11 +1,14 @@
 :root {
-    --pine-dark: #0f3d26;
-    --pine: #165b33;
-    --red: #b91c1c;
-    --red-hover: #991b1b;
-    --gold: #d97706;
+    --pine-dark: #103c26;
+    --pine: #175235;
+    --pine-light: #226b47;
+    --red: #a61c1c;
+    --red-bright: #c82323;
+    --gold: #d98a1c;
+    --gold-bright: #f5b041;
     --gold-light: #fef3c7;
-    --snow-bg: #faf7f2;
+    --cream: #fbf6eb;
+    --page-bg: #f4f6f2;
     --card-bg: #ffffff;
     --text-main: #1e293b;
     --text-muted: #64748b;
@@ -20,7 +23,7 @@
 
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--snow-bg);
+    background: var(--page-bg);
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
@@ -28,22 +31,30 @@ body {
     overflow-x: hidden;
 }
 
-/* --- Animation de neige légère en arrière-plan --- */
+/* --- Flocons & Particules festives --- */
 .snow-container {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 50;
+    z-index: 60;
     overflow: hidden;
 }
 
 .snowflake {
     position: absolute;
     top: -10%;
-    color: rgba(255, 255, 255, 0.85);
-    text-shadow: 0 0 4px rgba(15, 61, 38, 0.25);
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 4px rgba(16, 60, 38, 0.35);
     user-select: none;
     animation: fall linear infinite;
+}
+
+.burst-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 80;
+    font-size: 1.25rem;
+    animation: burstFly 1s ease-out forwards;
 }
 
 @keyframes fall {
@@ -51,111 +62,558 @@ body {
     100% { transform: translateY(110vh) rotate(360deg); }
 }
 
-/* --- Barre de navigation --- */
+@keyframes burstFly {
+    0% { opacity: 1; transform: translate(0, 0) scale(0.7); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1.3) rotate(180deg); }
+}
+
+/* --- Barre de navigation crème + pilule rouge Chau7 --- */
 nav {
-    background: linear-gradient(135deg, var(--pine-dark), var(--pine));
-    color: white;
-    padding: 0.9rem 1.5rem;
+    background: var(--cream);
+    padding: 0.75rem 1.5rem;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: 0.75rem;
-    border-bottom: 3px solid var(--gold);
+    border-bottom: 2px solid #e7decb;
     position: sticky;
     top: 0;
-    z-index: 40;
+    z-index: 50;
 }
 
 .brand {
-    color: white;
+    color: var(--pine-dark);
     text-decoration: none;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     font-weight: 800;
-    letter-spacing: 0.3px;
     display: flex;
     align-items: center;
     gap: 0.45rem;
 }
 
-.nav-links {
+.nav-pill-menu {
+    background: var(--red);
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
+    gap: 0.3rem;
+    box-shadow: 0 4px 12px rgba(166, 28, 28, 0.25);
 }
 
-.nav-links a {
+.nav-pill-menu a {
     color: rgba(255, 255, 255, 0.92);
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.95rem;
-    padding: 0.35rem 0.65rem;
-    border-radius: 6px;
-    transition: background 0.2s;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-}
-
-.user-pill {
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(251, 191, 36, 0.5);
-    padding: 0.3rem 0.75rem;
+    font-size: 0.9rem;
+    padding: 0.38rem 0.85rem;
     border-radius: 999px;
-    font-size: 0.85rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+.nav-pill-menu a:hover,
+.nav-pill-menu a.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.nav-right {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.guest-links {
+    display: flex;
+    gap: 0.45rem;
+}
+
+.guest-links a {
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 0.42rem 0.9rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--pine);
+    color: var(--pine);
+    transition: all 0.2s;
+}
+
+.guest-links a.btn-register-nav {
+    background: var(--pine);
+    color: white;
+}
+
+.guest-links a:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(16, 60, 38, 0.15);
+}
+
+.user-pill {
+    background: linear-gradient(135deg, #fffbeb, #fde68a);
+    border: 2px solid var(--gold);
+    color: #78350f;
+    padding: 0.32rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 3px 10px rgba(217, 138, 28, 0.18);
 }
 
 .btn-logout {
     background: var(--red);
     color: white;
     border: none;
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
     cursor: pointer;
     width: auto;
-    margin: 0;
 }
 
 .btn-logout:hover {
-    background: var(--red-hover);
+    background: var(--red-bright);
 }
 
-/* --- Conteneurs --- */
+/* --- Bannière Guirlande de Chaussettes N7 --- */
+.garland-header {
+    background: radial-gradient(circle at 50% 20%, #1d6340 0%, var(--pine-dark) 85%);
+    position: relative;
+    padding: 0.2rem 1rem 3.4rem;
+    overflow: hidden;
+}
+
+.garland-rope {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding-top: 0.35rem;
+    border-top: 3px dashed rgba(245, 176, 65, 0.65);
+}
+
+.hanging-sock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: top center;
+    animation: sway 3.4s ease-in-out infinite alternate;
+    cursor: pointer;
+    transition: filter 0.2s;
+    user-select: none;
+}
+
+.hanging-sock:nth-child(even) {
+    animation-duration: 4.1s;
+    animation-direction: alternate-reverse;
+}
+
+.hanging-sock:nth-child(3n) {
+    margin-top: 8px;
+}
+
+.hanging-sock:hover {
+    animation: jingle 0.45s ease-in-out;
+    filter: drop-shadow(0 0 8px rgba(245, 176, 65, 0.85));
+}
+
+@keyframes sway {
+    0% { transform: rotate(-5deg); }
+    100% { transform: rotate(5deg); }
+}
+
+@keyframes jingle {
+    0%, 100% { transform: rotate(0deg) scale(1.08); }
+    25% { transform: rotate(-14deg) scale(1.12); }
+    75% { transform: rotate(14deg) scale(1.12); }
+}
+
+/* --- Cartes Hero (Bannière Chau7 + Validation Code Secret) --- */
+.hero-cards {
+    max-width: 1120px;
+    margin: 0.9rem auto 0;
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 1.25rem;
+    position: relative;
+    z-index: 5;
+}
+
+.hero-welcome-card {
+    background: linear-gradient(135deg, rgba(16, 60, 38, 0.95), rgba(23, 82, 53, 0.95));
+    border: 2px solid var(--gold-bright);
+    border-radius: 18px;
+    padding: 1.35rem 1.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+.hero-welcome-card h1 {
+    font-size: 1.65rem;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+}
+
+.hero-welcome-card p {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.45;
+}
+
+.countdown-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.65rem;
+    background: rgba(245, 176, 65, 0.2);
+    border: 1px solid var(--gold-bright);
+    color: #fde68a;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.hero-code-card {
+    background: var(--card-bg);
+    border: 2px solid var(--gold-bright);
+    border-radius: 18px;
+    padding: 1.3rem 1.4rem;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hero-code-card label {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--pine-dark);
+    margin-bottom: 0.55rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.code-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.code-input-group input {
+    margin-bottom: 0;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1px;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.code-input-group button {
+    width: auto;
+    background: var(--red);
+    color: white;
+    border-radius: 10px;
+    padding: 0.7rem 1.15rem;
+    white-space: nowrap;
+}
+
+.mini-socks-meter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+    padding: 0 0.25rem;
+}
+
+.mini-sock-item {
+    opacity: 0.35;
+    transform: scale(0.92);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mini-sock-item.lit {
+    opacity: 1;
+    transform: scale(1.15) rotate(-6deg);
+}
+
+.snow-wave {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 44px;
+    pointer-events: none;
+}
+
+/* --- Conteneur principal & Disposition Calendrier + Sidebar --- */
 .main-wrapper {
     width: 100%;
-    max-width: 1100px;
+    max-width: 1180px;
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
+    padding: 1.25rem 1rem 3rem;
     flex: 1;
 }
 
+.home-layout {
+    display: grid;
+    grid-template-columns: 1fr 305px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.calendar-header h2 {
+    color: var(--pine-dark);
+    font-size: 1.3rem;
+}
+
+/* --- Grille des 19 cases Chaussettes --- */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+    gap: 0.95rem;
+}
+
+.day-card {
+    border-radius: 16px;
+    padding: 0.85rem;
+    min-height: 158px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s;
+    overflow: hidden;
+}
+
+.day-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 22px rgba(16, 60, 38, 0.18);
+}
+
+/* Case verrouillée : vert sapin profond */
+.day-card.locked {
+    background: linear-gradient(160deg, var(--pine) 0%, var(--pine-dark) 100%);
+    border: 2px solid #2b7a53;
+    color: white;
+}
+
+/* Case débloquée : crème & or festif */
+.day-card.unlocked {
+    background: linear-gradient(165deg, #fffdf9 0%, #f7e7c4 100%);
+    border: 2px solid var(--gold-bright);
+    color: var(--pine-dark);
+}
+
+.day-card.today {
+    box-shadow: 0 0 0 3px var(--red), 0 10px 20px rgba(166, 28, 28, 0.25);
+}
+
+.day-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+}
+
+.day-number {
+    font-size: 1.25rem;
+    font-weight: 900;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.day-card.locked .day-number {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.day-card.unlocked .day-number {
+    background: var(--gold);
+    color: #ffffff;
+}
+
+.day-date {
+    font-size: 0.74rem;
+    font-weight: 700;
+    opacity: 0.82;
+}
+
+.day-illustration {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.25rem 0;
+    transition: transform 0.25s;
+}
+
+.day-card:hover .day-illustration {
+    transform: rotate(-6deg) scale(1.06);
+}
+
+.day-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.25;
+    z-index: 2;
+}
+
+.lock-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: #fbbf24;
+    color: #78350f;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.slot-badges {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.badge {
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.14rem 0.45rem;
+    border-radius: 999px;
+    background: var(--red);
+    color: #ffffff;
+}
+
+/* --- Sidebar Droite (Mini-Podium & Historique) --- */
+.sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.sidebar-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.2rem;
+    border: 1.5px solid #e5dec9;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+}
+
+.sidebar-card h3 {
+    text-align: center;
+    color: var(--pine-dark);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.golden-sock-trophy {
+    display: flex;
+    justify-content: center;
+    margin: 0.35rem 0 0.8rem;
+    cursor: pointer;
+    transition: transform 0.25s;
+}
+
+.golden-sock-trophy:hover {
+    transform: scale(1.1) rotate(8deg);
+}
+
+.mini-podium {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: end;
+    gap: 0.35rem;
+    text-align: center;
+    margin-bottom: 0.9rem;
+}
+
+.mini-step {
+    border-radius: 10px 10px 4px 4px;
+    color: white;
+    font-weight: 900;
+    padding: 0.45rem 0.25rem;
+}
+
+.mini-step.step-2 { background: var(--red); height: 64px; }
+.mini-step.step-1 { background: linear-gradient(180deg, #f5b041, #d98a1c); height: 84px; font-size: 1.2rem; }
+.mini-step.step-3 { background: var(--pine); height: 52px; }
+
+.mini-step-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-link {
+    display: block;
+    text-align: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--red);
+    text-decoration: none;
+    margin-top: 0.65rem;
+}
+
+.sidebar-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Formulaires, Modales, Classement & Règles --- */
 .auth-container {
     width: 100%;
     max-width: 450px;
     margin: 2.5rem auto;
     background: var(--card-bg);
     padding: 2rem;
-    border-radius: 14px;
+    border-radius: 16px;
     border-top: 5px solid var(--red);
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-}
-
-h1, h2 {
-    color: var(--pine-dark);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
 }
 
 .auth-container h2 {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
     text-align: center;
+    color: var(--pine-dark);
 }
 
 .subtitle {
@@ -165,31 +623,28 @@ h1, h2 {
     margin-bottom: 1.4rem;
 }
 
-/* --- Formulaires & Boutons --- */
 label {
     display: block;
     font-size: 0.88rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.35rem;
     color: #334155;
 }
 
-input,
-select {
+input, select {
     width: 100%;
     padding: 0.7rem 0.85rem;
     margin-bottom: 1rem;
-    border: 1px solid #cbd5e1;
+    border: 1.5px solid #cbd5e1;
     border-radius: 8px;
     font-size: 0.95rem;
     background: white;
 }
 
-input:focus,
-select:focus {
+input:focus, select:focus {
     outline: none;
     border-color: var(--pine);
-    box-shadow: 0 0 0 3px rgba(22, 91, 51, 0.15);
+    box-shadow: 0 0 0 3px rgba(23, 82, 53, 0.15);
 }
 
 .row {
@@ -201,15 +656,14 @@ select:focus {
     flex: 1;
 }
 
-button,
-.btn-primary {
+button, .btn-primary {
     width: 100%;
     padding: 0.8rem 1.2rem;
     background: var(--red);
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 0.98rem;
+    border-radius: 10px;
+    font-size: 0.96rem;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
@@ -218,9 +672,8 @@ button,
     display: inline-block;
 }
 
-button:hover,
-.btn-primary:hover {
-    background: var(--red-hover);
+button:hover, .btn-primary:hover {
+    background: var(--red-bright);
 }
 
 .switch-link {
@@ -236,18 +689,13 @@ button:hover,
     font-weight: 700;
 }
 
-.switch-link a:hover {
-    text-decoration: underline;
-}
-
-/* --- Messages d'alerte Supabase --- */
 .alert-box {
     display: none;
-    padding: 0.8rem 1rem;
+    padding: 0.75rem 0.95rem;
     border-radius: 8px;
     margin-bottom: 1rem;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.88rem;
+    font-weight: 600;
 }
 
 .alert-box.error {
@@ -264,170 +712,13 @@ button:hover,
     border: 1px solid #bbf7d0;
 }
 
-/* --- Bannière d'accueil & Code Secret (index.html) --- */
-.hero-banner {
-    background: linear-gradient(135deg, var(--red), #7f1d1d);
-    color: white;
-    border-radius: 16px;
-    padding: 1.75rem;
-    margin-bottom: 1.75rem;
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 1.5rem;
-    align-items: center;
-    box-shadow: 0 10px 25px rgba(185, 28, 28, 0.18);
-}
-
-.hero-banner h1 {
-    color: white;
-    font-size: 1.65rem;
-    margin-bottom: 0.5rem;
-}
-
-.hero-banner p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.code-card {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    padding: 1.2rem;
-    border-radius: 12px;
-}
-
-.code-card label {
-    color: var(--gold-light);
-    margin-bottom: 0.45rem;
-}
-
-.code-input-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.code-input-group input {
-    margin-bottom: 0;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-.code-input-group button {
-    width: auto;
-    background: var(--gold);
-    color: #1e293b;
-    white-space: nowrap;
-}
-
-.code-input-group button:hover {
-    background: #f59e0b;
-}
-
-/* --- Grille des 19 cases du Calendrier de l'Avent --- */
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 1rem;
-}
-
-.day-card {
-    background: var(--card-bg);
-    border: 2px solid var(--border);
-    border-radius: 14px;
-    padding: 1.1rem;
-    min-height: 145px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
-}
-
-.day-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-}
-
-.day-card.unlocked {
-    border-color: var(--pine);
-    background: linear-gradient(180deg, #ffffff 65%, #f0fdf4 100%);
-}
-
-.day-card.today {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.25);
-}
-
-.day-card.locked {
-    background: #f1f5f9;
-    border-style: dashed;
-    color: var(--text-muted);
-}
-
-.day-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.day-number {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--red);
-}
-
-.day-card.locked .day-number {
-    color: #64748b;
-}
-
-.day-date {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-.day-title {
-    font-size: 0.92rem;
-    font-weight: 700;
-    margin: 0.5rem 0;
-    line-height: 1.3;
-}
-
-.slot-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-}
-
-.badge {
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 0.18rem 0.45rem;
-    border-radius: 999px;
-    background: var(--gold-light);
-    color: #92400e;
-}
-
-/* --- Modale des 4 créneaux d'une journée --- */
+/* --- Modale --- */
 .modal-backdrop {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.65);
-    z-index: 60;
+    background: rgba(15, 23, 42, 0.68);
+    z-index: 70;
     align-items: center;
     justify-content: center;
     padding: 1rem;
@@ -440,13 +731,13 @@ button:hover,
 .modal-box {
     background: white;
     width: 100%;
-    max-width: 560px;
+    max-width: 550px;
     max-height: 88vh;
     overflow-y: auto;
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 1.5rem;
     border-top: 6px solid var(--pine);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
@@ -462,12 +753,8 @@ button:hover,
     width: auto;
     background: #e2e8f0;
     color: #1e293b;
-    padding: 0.35rem 0.7rem;
-    font-size: 0.9rem;
-}
-
-.btn-close:hover {
-    background: #cbd5e1;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.88rem;
 }
 
 .slot-item {
@@ -476,7 +763,7 @@ button:hover,
     border-radius: 10px;
     padding: 0.9rem 1rem;
     margin-bottom: 0.85rem;
-    background: #fff;
+    background: #fffdf9;
 }
 
 .slot-item-header {
@@ -488,7 +775,7 @@ button:hover,
 
 .slot-tag {
     text-transform: uppercase;
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     font-weight: 800;
     color: var(--pine);
     background: #dcfce7;
@@ -497,18 +784,12 @@ button:hover,
 }
 
 .slot-points {
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 0.82rem;
+    font-weight: 800;
     color: var(--gold);
 }
 
-.slot-meta {
-    font-size: 0.83rem;
-    color: var(--text-muted);
-    margin-top: 0.4rem;
-}
-
-/* --- Page Classement & Logs (classement.html) --- */
+/* --- Classement & Règles --- */
 .podium {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -519,7 +800,7 @@ button:hover,
 
 .podium-card {
     background: white;
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 1.2rem 0.8rem;
     text-align: center;
     border: 2px solid var(--border);
@@ -527,22 +808,9 @@ button:hover,
 }
 
 .podium-card.rank-1 {
-    border-color: #f59e0b;
+    border-color: var(--gold-bright);
     background: linear-gradient(180deg, #fffbeb, #ffffff);
     padding-top: 1.7rem;
-}
-
-.podium-card.rank-2 {
-    border-color: #94a3b8;
-}
-
-.podium-card.rank-3 {
-    border-color: #b45309;
-}
-
-.medal {
-    font-size: 1.8rem;
-    margin-bottom: 0.3rem;
 }
 
 .filter-bar {
@@ -556,13 +824,12 @@ button:hover,
     width: auto;
     background: white;
     color: var(--text-main);
-    border: 1px solid #cbd5e1;
-    padding: 0.45rem 0.9rem;
+    border: 1.5px solid #cbd5e1;
+    padding: 0.45rem 0.95rem;
     font-size: 0.88rem;
 }
 
-.filter-btn.active,
-.filter-btn:hover {
+.filter-btn.active, .filter-btn:hover {
     background: var(--pine);
     color: white;
     border-color: var(--pine);
@@ -577,8 +844,9 @@ button:hover,
 
 .panel-card {
     background: white;
-    border-radius: 14px;
-    padding: 1.25rem;
+    border-radius: 16px;
+    padding: 1.35rem;
+    border: 1px solid var(--border);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
 }
 
@@ -597,14 +865,14 @@ th, td {
 
 th {
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
 }
 
 .filiere-badge {
     background: #e2e8f0;
     color: #334155;
-    padding: 0.15rem 0.5rem;
+    padding: 0.18rem 0.5rem;
     border-radius: 6px;
     font-size: 0.78rem;
     font-weight: 700;
@@ -612,17 +880,17 @@ th {
 
 .log-list {
     list-style: none;
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
 }
 
 .log-item {
-    padding: 0.7rem 0;
+    padding: 0.6rem 0;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 0.75rem;
-    font-size: 0.88rem;
+    gap: 0.6rem;
+    font-size: 0.85rem;
 }
 
 .log-points {
@@ -631,24 +899,6 @@ th {
     white-space: nowrap;
 }
 
-footer {
-    text-align: center;
-    padding: 1.2rem;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-@media (max-width: 768px) {
-    .hero-banner,
-    .leaderboard-layout {
-        grid-template-columns: 1fr;
-    }
-    .podium {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* --- Page Règles (regles.html) --- */
 .rules-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -657,53 +907,34 @@ footer {
 
 .rule-card {
     background: var(--card-bg);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 1.4rem;
     border: 1px solid var(--border);
     border-top: 4px solid var(--pine);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
 }
 
-.rule-icon {
-    font-size: 1.8rem;
-    margin-bottom: 0.4rem;
+.rule-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.rule-card h2 { font-size: 1.15rem; margin-bottom: 0.6rem; color: var(--pine-dark); }
+.rule-card p { font-size: 0.92rem; line-height: 1.5; color: #334155; margin-bottom: 0.7rem; }
+.rule-list { padding-left: 1.2rem; font-size: 0.9rem; line-height: 1.55; }
+.rule-list li { margin-bottom: 0.4rem; }
+.rule-list a { color: var(--red); font-weight: 700; text-decoration: none; }
+
+footer {
+    text-align: center;
+    padding: 1.3rem;
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    background: var(--cream);
+    border-top: 1px solid #e7decb;
 }
 
-.rule-card h2 {
-    font-size: 1.15rem;
-    margin-bottom: 0.6rem;
-}
-
-.rule-card p {
-    font-size: 0.92rem;
-    line-height: 1.5;
-    color: #334155;
-    margin-bottom: 0.7rem;
-}
-
-.rule-list {
-    padding-left: 1.2rem;
-    font-size: 0.9rem;
-    line-height: 1.55;
-    color: var(--text-main);
-}
-
-.rule-list li {
-    margin-bottom: 0.4rem;
-}
-
-.rule-list a {
-    color: var(--red);
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.rule-list a:hover {
-    text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-    .rules-grid {
+@media (max-width: 920px) {
+    .hero-cards, .home-layout, .leaderboard-layout, .rules-grid {
+        grid-template-columns: 1fr;
+    }
+    .podium {
         grid-template-columns: 1fr;
     }
 }

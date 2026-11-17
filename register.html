@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Calendrier de l'Avent</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- SDK officiel Supabase via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav>
+        <a href="login.html" class="brand">🎄 Calendrier de l'Avent</a>
+        <div>
+            <a href="login.html">Connexion</a>
+            <a href="register.html">Inscription</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Créer un compte</h2>
+
+        <div id="auth-message"></div>
+
+        <form id="register-form">
+            <div class="row">
+                <div>
+                    <label for="prenom">Prénom</label>
+                    <input type="text" id="prenom" name="prenom" placeholder="Maxime" required>
+                </div>
+                <div>
+                    <label for="nom">Nom</label>
+                    <input type="text" id="nom" name="nom" placeholder="Dupont" required>
+                </div>
+            </div>
+
+            <label for="filiere">Filière</label>
+            <select id="filiere" name="filiere" required>
+                <option value="" disabled selected>Choisis ta filière</option>
+                <option value="3EA">3EA</option>
+                <option value="SN">SN</option>
+                <option value="MF2E">MF2E</option>
+                <option value="Autre">Autre</option>
+            </select>
+
+            <label for="email">Adresse email</label>
+            <input type="email" id="email" name="email" placeholder="prenom.nom@etu.inp-toulouse.fr" required>
+
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" minlength="6" required>
+
+            <button type="submit" id="btn-register">S'inscrire</button>
+        </form>
+
+        <p class="switch-link">
+            Déjà inscrit ? <a href="login.html">Se connecter</a>
+        </p>
+    </div>
+
+    <!-- Thomas pourra brancher son script Supabase ici -->
+    <script src="auth.js"></script>
+</body>
+</html>

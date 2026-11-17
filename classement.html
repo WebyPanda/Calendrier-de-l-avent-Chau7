@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classement & Historique - Calendrier Chau7</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="brand">🎄 Calendrier Chau7</a>
+        <div class="nav-links">
+            <a href="index.html">Calendrier</a>
+            <a href="classement.html" class="active">Classement & Logs</a>
+            <a href="regles.html">Règles</a>
+            <div id="nav-guest" style="display:flex; gap:0.6rem;">
+                <a href="login.html">Connexion</a>
+                <a href="register.html">Inscription</a>
+            </div>
+            <div id="nav-user" class="user-pill" style="display:none;">
+                <span>🎅 <strong id="user-identifiant">Joueur</strong> (<span id="user-filiere">-</span>)</span>
+                <span>🏆 <strong id="user-points">0</strong> pts</span>
+                <button type="button" id="btn-logout" class="btn-logout">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-wrapper">
+        <h1>🏆 Classement Général Chau7</h1>
+        <p style="color:var(--text-muted); margin-top:0.3rem;">
+            Scores mis à jour en direct et historique 100 % public des gains de points.
+        </p>
+
+        <!-- Podium Top 3 -->
+        <section class="podium" id="podium-container">
+            <div class="podium-card rank-2">
+                <div class="medal">🥈</div>
+                <strong id="top2-identifiant">-</strong>
+                <div style="font-size:0.85rem; color:var(--text-muted);" id="top2-filiere">-</div>
+                <div style="font-weight:800; color:var(--pine); margin-top:0.4rem;"><span id="top2-points">0</span> pts</div>
+            </div>
+            <div class="podium-card rank-1">
+                <div class="medal">🥇</div>
+                <strong id="top1-identifiant">-</strong>
+                <div style="font-size:0.85rem; color:var(--text-muted);" id="top1-filiere">-</div>
+                <div style="font-weight:800; color:var(--red); font-size:1.15rem; margin-top:0.4rem;"><span id="top1-points">0</span> pts</div>
+            </div>
+            <div class="podium-card rank-3">
+                <div class="medal">🥉</div>
+                <strong id="top3-identifiant">-</strong>
+                <div style="font-size:0.85rem; color:var(--text-muted);" id="top3-filiere">-</div>
+                <div style="font-weight:800; color:var(--pine); margin-top:0.4rem;"><span id="top3-points">0</span> pts</div>
+            </div>
+        </section>
+
+        <!-- Filtres par filière N7 (Archit.md) -->
+        <div class="filter-bar" id="filiere-filters">
+            <button type="button" class="filter-btn active" data-filiere="ALL">Toutes les filières</button>
+            <button type="button" class="filter-btn" data-filiere="3EA">3EA</button>
+            <button type="button" class="filter-btn" data-filiere="SN">SN</button>
+            <button type="button" class="filter-btn" data-filiere="MF2E">MF2E</button>
+            <button type="button" class="filter-btn" data-filiere="FISA">FISA</button>
+            <button type="button" class="filter-btn" data-filiere="Autre">Autre</button>
+        </div>
+
+        <div class="leaderboard-layout">
+            <!-- Tableau du classement -->
+            <section class="panel-card">
+                <h2>📊 Tableau des scores</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rang</th>
+                            <th>Identifiant</th>
+                            <th>Filière</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr>
+                            <td colspan="4" style="text-align:center; color:var(--text-muted);">Chargement du classement...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Journal public transparent (table point_logs) -->
+            <aside class="panel-card">
+                <h2>📜 Derniers points gagnés</h2>
+                <p style="font-size:0.82rem; color:var(--text-muted); margin-top:0.2rem;">
+                    Journal transparent (anti-triche)
+                </p>
+                <ul id="point-logs-list" class="log-list">
+                    <li class="log-item" style="color:var(--text-muted);">Chargement de l'historique...</li>
+                </ul>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        Pré-liste Chau7 — Toulouse INP-ENSEEIHT 🎄
+    </footer>
+
+    <script src="auth.js"></script>
+    <script src="leaderboard.js"></script>
+</body>
+</html>

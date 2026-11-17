@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Règles du jeu - Calendrier de l'Avent Chau7</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Flocons de neige décoratifs -->
+    <div class="snow-container" aria-hidden="true">
+        <span class="snowflake" style="left:10%; animation-duration:12s; font-size:1.1rem;">❄</span>
+        <span class="snowflake" style="left:32%; animation-duration:15s; animation-delay:2s; font-size:0.9rem;">❅</span>
+        <span class="snowflake" style="left:58%; animation-duration:13s; animation-delay:4s; font-size:1.2rem;">❄</span>
+        <span class="snowflake" style="left:80%; animation-duration:16s; animation-delay:1s; font-size:0.85rem;">❆</span>
+    </div>
+
+    <nav>
+        <a href="index.html" class="brand">🎄 Calendrier Chau7</a>
+        <div class="nav-links">
+            <a href="index.html">Calendrier</a>
+            <a href="classement.html">Classement & Logs</a>
+            <a href="regles.html" class="active">Règles</a>
+            <div id="nav-guest" style="display:flex; gap:0.6rem;">
+                <a href="login.html">Connexion</a>
+                <a href="register.html">Inscription</a>
+            </div>
+            <div id="nav-user" class="user-pill" style="display:none;">
+                <span>🎅 <strong id="user-identifiant">Joueur</strong> (<span id="user-filiere">-</span>)</span>
+                <span>🏆 <strong id="user-points">0</strong> pts</span>
+                <button type="button" id="btn-logout" class="btn-logout">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-wrapper">
+        <!-- En-tête de présentation -->
+        <section class="hero-banner" style="grid-template-columns: 1fr;">
+            <div>
+                <h1>📜 Règles du Calendrier de l'Avent Chau7</h1>
+                <p>
+                    Bienvenue sur le jeu de Noël de la pré-liste <strong>Chau7 (Toulouse INP-ENSEEIHT)</strong> !
+                    Du <strong>1er au 19 décembre 2026</strong>, participe aux animations sur le campus, récolte des points
+                    et hisse ta filière en tête du classement avant les vacances d'hiver.
+                </p>
+            </div>
+        </section>
+
+        <!-- Grille des 4 règles principales -->
+        <section class="rules-grid">
+            <article class="rule-card">
+                <div class="rule-icon">📅</div>
+                <h2>1. Le calendrier en 19 cases</h2>
+                <p>
+                    Chaque jour du <strong>1er au 19 décembre 2026</strong> correspond à une case du calendrier.
+                    Tant qu'un événement n'est pas dévoilé, sa case reste verrouillée (<strong>🔒</strong>).
+                </p>
+                <ul class="rule-list">
+                    <li>Jusqu'à <strong>4 créneaux par jour</strong> : <em>Matin</em>, <em>Midi</em>, <em>Aprèm</em> et <em>Soir</em>.</li>
+                    <li>Clique sur une case débloquée pour voir le lieu (Foyer N7, campus, Instagram <strong>@chau7.n7</strong>...) et les points à gagner.</li>
+                </ul>
+            </article>
+
+            <article class="rule-card">
+                <div class="rule-icon">🎁</div>
+                <h2>2. Comment gagner des points ?</h2>
+                <p>
+                    Il existe deux façons de faire grimper ton compteur de points tout au long de l'Avent :
+                </p>
+                <ul class="rule-list">
+                    <li><strong>Codes secrets & QR codes :</strong> lors de nos distributions, soirées ou stories Insta, flashe le QR code affiché ou saisis le code manuellement sur la page <a href="index.html">Calendrier</a>.</li>
+                    <li><strong>Victoires aux défis :</strong> remporte les mini-jeux, tournois ou épreuves organisés par la pré-liste pour recevoir un bonus directement attribué par l'équipe Chau7.</li>
+                </ul>
+            </article>
+
+            <article class="rule-card">
+                <div class="rule-icon">🛡️</div>
+                <h2>3. Fair-play & Anti-triche</h2>
+                <p>
+                    Pour garantir une compétition équitable entre tous les étudiants de l'N7 :
+                </p>
+                <ul class="rule-list">
+                    <li><strong>Usage unique :</strong> chaque code secret n'est validable qu'<strong>une seule fois</strong> par compte.</li>
+                    <li><strong>Places et durée limitées :</strong> certains codes ont un nombre maximal d'utilisations (premiers arrivés, premiers servis !) ou une heure d'expiration.</li>
+                    <li><strong>100 % transparent :</strong> chaque gain de points apparaît en direct dans le journal public sur la page <a href="classement.html">Classement & Logs</a>.</li>
+                </ul>
+            </article>
+
+            <article class="rule-card">
+                <div class="rule-icon">🏆</div>
+                <h2>4. Classement & Filières N7</h2>
+                <p>
+                    Ton score compte à la fois pour ton classement individuel et pour l'honneur de ta filière :
+                </p>
+                <ul class="rule-list">
+                    <li><strong>Filières en compétition :</strong> 3EA, SN, MF2E, FISA et Autre.</li>
+                    <li><strong>Identifiant public :</strong> seul ton pseudo choisi à l'inscription est affiché publiquement dans le tableau des scores.</li>
+                    <li><strong>Podium final :</strong> les meilleurs joueurs du classement général seront récompensés à la fin des 19 jours !</li>
+                </ul>
+            </article>
+        </section>
+
+        <!-- Encadré démarrage rapide -->
+        <section class="panel-card" style="margin-top: 1.5rem; text-align: center;">
+            <h2>🚀 Prêt à jouer ?</h2>
+            <p style="color: var(--text-muted); margin: 0.5rem auto 1.2rem; max-width: 560px;">
+                Crée ton compte en 30 secondes avec ton adresse e-mail, choisis ta filière et ton identifiant public,
+                puis valide ton premier code dès l'ouverture des cases !
+            </p>
+            <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
+                <a href="register.html" class="btn-primary" style="width: auto;">Créer mon compte</a>
+                <a href="index.html" class="btn-primary" style="width: auto; background: var(--pine);">Voir le calendrier</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        Pré-liste Chau7 — Toulouse INP-ENSEEIHT 🎄
+    </footer>
+
+    <script src="auth.js"></script>
+</body>
+</html>

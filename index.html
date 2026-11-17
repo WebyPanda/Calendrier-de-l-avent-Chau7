@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier de l'Avent Chau7 - ENSEEIHT</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Flocons de neige décoratifs -->
+    <div class="snow-container" aria-hidden="true">
+        <span class="snowflake" style="left:8%; animation-duration:11s; font-size:1.1rem;">❄</span>
+        <span class="snowflake" style="left:24%; animation-duration:15s; animation-delay:2s; font-size:0.9rem;">❅</span>
+        <span class="snowflake" style="left:43%; animation-duration:12s; animation-delay:4s; font-size:1.2rem;">❄</span>
+        <span class="snowflake" style="left:65%; animation-duration:16s; animation-delay:1s; font-size:0.85rem;">❆</span>
+        <span class="snowflake" style="left:84%; animation-duration:13s; animation-delay:3s; font-size:1.1rem;">❄</span>
+    </div>
+
+    <nav>
+        <a href="index.html" class="brand">🎄 Calendrier Chau7</a>
+        <div class="nav-links">
+            <a href="index.html" class="active">Calendrier</a>
+            <a href="classement.html">Classement & Logs</a>
+            <a href="regles.html">Règles</a>
+            <!-- Affiché si déconnecté -->
+            <div id="nav-guest" style="display:flex; gap:0.6rem;">
+                <a href="login.html">Connexion</a>
+                <a href="register.html">Inscription</a>
+            </div>
+            <!-- Affiché par le JS Supabase une fois connecté -->
+            <div id="nav-user" class="user-pill" style="display:none;">
+                <span>🎅 <strong id="user-identifiant">Joueur</strong> (<span id="user-filiere">-</span>)</span>
+                <span>🏆 <strong id="user-points">0</strong> pts</span>
+                <button type="button" id="btn-logout" class="btn-logout">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-wrapper">
+        <!-- Bannière + Formulaire Code Secret / QR Code -->
+        <section class="hero-banner">
+            <div>
+                <h1>🎅 L'Avent Chau7 à l'N7</h1>
+                <p>
+                    Du <strong>1er au 19 décembre 2026</strong>, découvre chaque jour les animations de la pré-liste Chau7
+                    (matin, midi, aprèm, soir) et valide tes codes secrets distribués sur le campus !
+                </p>
+            </div>
+
+            <div class="code-card">
+                <form id="secret-code-form">
+                    <label for="secret-code-input">🎁 Valider un code secret ou QR code</label>
+                    <div class="code-input-group">
+                        <input type="text" id="secret-code-input" name="code" placeholder="EX: CHAU7CREPES" autocomplete="off" required>
+                        <button type="submit" id="btn-submit-code">Valider</button>
+                    </div>
+                </form>
+                <div id="code-message" class="alert-box" style="margin-top:0.75rem; margin-bottom:0;"></div>
+            </div>
+        </section>
+
+        <!-- Grille des 19 cases -->
+        <div class="calendar-header">
+            <h2>📅 Les 19 cases de décembre</h2>
+            <span style="font-size:0.88rem; color:var(--text-muted);">Clique sur une case débloquée pour voir les 4 créneaux</span>
+        </div>
+
+        <section id="calendar-grid" class="calendar-grid">
+            <!-- Rempli dynamiquement depuis Supabase (table advent_events) -->
+        </section>
+    </main>
+
+    <!-- Modale affichant les créneaux (matin, midi, aprem, soir) d'un jour -->
+    <div id="day-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="modal-day-title">Jour 1 — 1er décembre</h2>
+                <button type="button" id="btn-close-modal" class="btn-close">Fermer ✕</button>
+            </div>
+            <div id="modal-slots-container">
+                <!-- Créneaux du jour injectés ici -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Pré-liste Chau7 — Toulouse INP-ENSEEIHT 🎄
+    </footer>
+
+    <script>
+        // 1. Pré-remplissage automatique si l'étudiant scanne un QR code (?code=XXXX)
+        const params = new URLSearchParams(window.location.search);
+        const qrCode = params.get("code");
+        if (qrCode) {
+            const input = document.getElementById("secret-code-input");
+            input.value = qrCode.trim().toUpperCase();
+            input.focus();
+        }
+
+        // 2. Génération initiale des 19 cases (Thomas remplacera/enrichira via Supabase advent_events)
+        const grid = document.getElementById("calendar-grid");
+        for (let day = 1; day <= 19; day++) {
+            const card = document.createElement("article");
+            card.className = "day-card locked";
+            card.dataset.day = day;
+            card.innerHTML = `
+                <div class="day-top">
+                    <span class="day-number">${day}</span>
+                    <span class="day-date">${day} déc.</span>
+                </div>
+                <div class="day-title">🔒 Case verrouillée</div>
+                <div class="slot-badges">
+                    <span class="badge">En attente</span>
+                </div>
+            `;
+            card.addEventListener("click", () => {
+                document.getElementById("modal-day-title").textContent = `Jour ${day} — ${day} décembre 2026`;
+                if (!document.getElementById("modal-slots-container").innerHTML.trim()) {
+                    document.getElementById("modal-slots-container").innerHTML =
+                        `<p style="color:var(--text-muted);">Les créneaux (matin, midi, aprèm, soir) de ce jour s'afficheront ici dès qu'ils seront révélés.</p>`;
+                }
+                document.getElementById("day-modal").classList.add("open");
+            });
+            grid.appendChild(card);
+        }
+
+        // 3. Fermeture de la modale
+        const modal = document.getElementById("day-modal");
+        document.getElementById("btn-close-modal").addEventListener("click", () => modal.classList.remove("open"));
+        modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
+    </script>
+
+    <!-- Scripts Supabase de Thomas -->
+    <script src="auth.js"></script>
+    <script src="calendar.js"></script>
+</body>
+</html>

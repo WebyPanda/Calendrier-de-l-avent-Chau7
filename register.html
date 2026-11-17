@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription - Calendrier de l'Avent</title>
+    <title>Inscription - Calendrier de l'Avent Chau7</title>
     <link rel="stylesheet" href="style.css">
-    <!-- SDK officiel Supabase via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <nav>
-        <a href="login.html" class="brand">🎄 Calendrier de l'Avent</a>
-        <div>
+        <a href="index.html" class="brand">🎄 Calendrier Chau7</a>
+        <div class="nav-links">
+            <a href="index.html">Calendrier</a>
+            <a href="classement.html">Classement & Logs</a>
             <a href="login.html">Connexion</a>
-            <a href="register.html">Inscription</a>
+            <a href="register.html" class="active">Inscription</a>
+            <a href="regles.html">Règles</a>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="auth-container">
         <h2>Créer un compte</h2>
+        <p class="subtitle">Rejoins la chasse aux points Chau7 à l'N7</p>
 
-        <div id="auth-message"></div>
+        <div id="auth-message" class="alert-box"></div>
 
         <form id="register-form">
             <div class="row">
@@ -34,12 +37,16 @@
                 </div>
             </div>
 
+            <label for="identifiant">Identifiant public (pseudo affiché au classement)</label>
+            <input type="text" id="identifiant" name="identifiant" placeholder="Maxou3EA" required>
+
             <label for="filiere">Filière</label>
             <select id="filiere" name="filiere" required>
                 <option value="" disabled selected>Choisis ta filière</option>
                 <option value="3EA">3EA</option>
                 <option value="SN">SN</option>
                 <option value="MF2E">MF2E</option>
+                <option value="FISA">FISA</option>
                 <option value="Autre">Autre</option>
             </select>
 
@@ -57,7 +64,6 @@
         </p>
     </div>
 
-    <!-- Thomas pourra brancher son script Supabase ici -->
     <script src="auth.js"></script>
 </body>
 </html>

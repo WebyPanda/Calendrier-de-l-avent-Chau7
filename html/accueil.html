@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier de l'Avent Chau7 - ENSEEIHT</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Flocons animés -->
+    <div class="snow-container" aria-hidden="true">
+        <span class="snowflake" style="left:6%; animation-duration:11s; font-size:1.1rem;">❄</span>
+        <span class="snowflake" style="left:21%; animation-duration:15s; animation-delay:2s; font-size:0.9rem;">❅</span>
+        <span class="snowflake" style="left:39%; animation-duration:12s; animation-delay:4s; font-size:1.2rem;">❄</span>
+        <span class="snowflake" style="left:58%; animation-duration:16s; animation-delay:1s; font-size:0.95rem;">❆</span>
+        <span class="snowflake" style="left:76%; animation-duration:13s; animation-delay:3s; font-size:1.15rem;">❄</span>
+        <span class="snowflake" style="left:91%; animation-duration:14s; animation-delay:5s; font-size:0.9rem;">❅</span>
+    </div>
+
+    <!-- Barre de navigation -->
+    <nav>
+        <a href="accueil.html" class="brand">🎄 Calendrier Chau7 🧦</a>
+
+        <div class="nav-pill-menu">
+            <a href="accueil.html" class="active">Calendrier</a>
+            <a href="classement.html">Classement</a>
+            <a href="regles.html">Règles</a>
+        </div>
+
+        <div class="nav-right">
+            <div id="nav-guest" class="guest-links">
+                <a href="login.html">Connexion</a>
+                <a href="register.html" class="btn-register-nav">Inscription</a>
+            </div>
+            <div id="nav-user" class="user-pill" style="display:none;">
+                <span>🎅 <strong id="user-identifiant">Joueur</strong> (<span id="user-filiere">-</span>)</span>
+                <span>🏆 <strong id="user-points">0</strong> pts 🧦</span>
+                <button type="button" id="btn-logout" class="btn-logout">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Guirlande de chaussettes suspendues par filière -->
+    <header class="garland-header">
+        <div class="garland-rope" id="garland-rope" aria-hidden="true"></div>
+
+        <div class="hero-cards">
+            <!-- Carte gauche : Bannière Chau7 + Compte à rebours -->
+            <div class="hero-welcome-card">
+                <div id="hero-big-socks" style="flex-shrink:0;"></div>
+                <div>
+                    <h1>L'Avent Chau7 à l'N7 🎅</h1>
+                    <p>
+                        Du <strong>1er au 19 décembre 2026</strong>, ouvre chaque jour ta chaussette de l'Avent
+                        (matin, midi, aprèm, soir) et valide tes codes secrets sur le campus !
+                    </p>
+                    <div class="countdown-pill" id="countdown-pill">⏳ Chargement du compte à rebours...</div>
+                </div>
+            </div>
+
+            <!-- Carte droite : Validation code secret + mini-chaussettes réactives -->
+            <div class="hero-code-card">
+                <form id="secret-code-form">
+                    <label for="secret-code-input">🎁 Cadeau : Valider un code secret</label>
+                    <div class="code-input-group">
+                        <input type="text" id="secret-code-input" name="code" placeholder="EX: CHAU7CREPES" autocomplete="off" required>
+                        <button type="submit" id="btn-submit-code">Valider 🧦</button>
+                    </div>
+                </form>
+                <div class="mini-socks-meter" id="mini-socks-meter" aria-hidden="true"></div>
+                <div id="code-message" class="alert-box" style="margin-top:0.65rem; margin-bottom:0;"></div>
+            </div>
+        </div>
+
+        <!-- Vague de neige & sapins en bas de bannière -->
+        <svg class="snow-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+            <path fill="#f4f6f2" d="M0,32 C240,64 480,0 720,32 C960,64 1200,10 1440,36 L1440,60 L0,60 Z"></path>
+        </svg>
+    </header>
+
+    <!-- Contenu principal : 19 cases à gauche + Podium & Logs à droite -->
+    <main class="main-wrapper">
+        <div class="home-layout">
+            <div>
+                <div class="calendar-header">
+                    <h2>🧦 Les 19 chaussettes de décembre</h2>
+                    <span style="font-size:0.86rem; color:var(--text-muted);">Clique sur une case pour voir les 4 créneaux</span>
+                </div>
+                <section id="calendar-grid" class="calendar-grid"></section>
+            </div>
+
+            <!-- Sidebar Classement & Historique -->
+            <aside class="sidebar-column">
+                <div class="sidebar-card">
+                    <h3>Classement Général</h3>
+                    <div class="golden-sock-trophy" id="golden-sock-btn" title="Clique pour la magie de Noël !">
+                        <svg width="68" height="78" viewBox="0 0 80 95">
+                            <path d="M24 10 H52 V46 C52 60 66 64 66 76 C66 86 54 90 40 90 C26 90 22 80 24 68 L24 10 Z" fill="#f5b041" stroke="#b45309" stroke-width="3"/>
+                            <rect x="20" y="6" width="36" height="14" rx="5" fill="#fffbeb" stroke="#d98a1c" stroke-width="2.5"/>
+                            <path d="M52 58 C60 58 65 65 65 73 C60 73 53 68 52 58 Z" fill="#fde68a"/>
+                        </svg>
+                    </div>
+                    <div class="mini-podium">
+                        <div>
+                            <div class="mini-step-name" id="sidebar-top2">-</div>
+                            <div class="mini-step step-2">2</div>
+                        </div>
+                        <div>
+                            <div class="mini-step-name" id="sidebar-top1">-</div>
+                            <div class="mini-step step-1">1</div>
+                        </div>
+                        <div>
+                            <div class="mini-step-name" id="sidebar-top3">-</div>
+                            <div class="mini-step step-3">3</div>
+                        </div>
+                    </div>
+                    <a href="classement.html" class="sidebar-link">Voir tout le classement →</a>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>Historique de points</h3>
+                    <ul id="sidebar-logs-list" class="log-list">
+                        <li class="log-item" style="color:var(--text-muted);">En attente des premiers codes...</li>
+                    </ul>
+                    <a href="classement.html" class="sidebar-link">Journal complet anti-triche →</a>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Modale des 4 créneaux -->
+    <div id="day-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="modal-day-title">Jour 1 — 1er décembre</h2>
+                <button type="button" id="btn-close-modal" class="btn-close">Fermer ✕</button>
+            </div>
+            <div id="modal-slots-container"></div>
+        </div>
+    </div>
+
+    <footer>
+        Pré-liste Chau7 — Toulouse INP-ENSEEIHT 🎄🧦
+    </footer>
+
+    <script>
+        // Générateur de chaussette SVG tricotée personnalisable
+        function createSockSVG(width, height, bodyColor, cuffColor, heelColor, labelText, patternType) {
+            let pattern = "";
+            if (patternType === "stripes") {
+                pattern = `<line x1="25" y1="28" x2="51" y2="28" stroke="#fff" stroke-width="3"/>
+                           <line x1="25" y1="38" x2="51" y2="38" stroke="#f5b041" stroke-width="3"/>
+                           <line x1="25" y1="48" x2="51" y2="48" stroke="#fff" stroke-width="3"/>`;
+            } else if (patternType === "dots") {
+                pattern = `<circle cx="33" cy="31" r="2.2" fill="#fff"/><circle cx="44" cy="35" r="2.2" fill="#fde68a"/>
+                           <circle cx="32" cy="44" r="2.2" fill="#fde68a"/><circle cx="45" cy="48" r="2.2" fill="#fff"/>`;
+            } else {
+                pattern = `<text x="38" y="45" text-anchor="middle" fill="#fff" font-size="14">❄</text>`;
+            }
+            const label = labelText
+                ? `<text x="38" y="16" text-anchor="middle" fill="#103c26" font-size="8.5" font-weight="900" font-family="sans-serif">${labelText}</text>`
+                : "";
+            return `
+                <svg width="${width}" height="${height}" viewBox="0 0 80 95">
+                    <path d="M24 12 H52 V46 C52 60 66 64 66 76 C66 86 54 90 40 90 C26 90 22 80 24 68 L24 12 Z"
+                          fill="${bodyColor}" stroke="#0f291c" stroke-width="2.5"/>
+                    ${pattern}
+                    <path d="M52 58 C60 58 65 65 65 73 C60 73 53 68 52 58 Z" fill="${heelColor}"/>
+                    <rect x="20" y="6" width="36" height="14" rx="5" fill="${cuffColor}" stroke="#0f291c" stroke-width="2"/>
+                    ${label}
+                </svg>
+            `;
+        }
+
+        // Animation pluie festive au clic
+        function burstMagic(x, y) {
+            const icons = ["🧦", "🎄", "⭐", "❄", "🎁"];
+            for (let i = 0; i < 12; i++) {
+                const el = document.createElement("span");
+                el.className = "burst-particle";
+                el.textContent = icons[i % icons.length];
+                el.style.left = x + "px";
+                el.style.top = y + "px";
+                const angle = (Math.PI * 2 * i) / 12;
+                const dist = 55 + Math.random() * 55;
+                el.style.setProperty("--tx", Math.cos(angle) * dist + "px");
+                el.style.setProperty("--ty", Math.sin(angle) * dist + "px");
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1000);
+            }
+        }
+
+        // 1. Remplir la guirlande des filières N7
+        const garlandLabels = ["CHAU7", "SN", "3EA", "MF2E", "FISA", "CHAU7", "N7", "3EA", "SN", "MF2E"];
+        const rope = document.getElementById("garland-rope");
+        garlandLabels.forEach((lbl, idx) => {
+            const div = document.createElement("div");
+            div.className = "hanging-sock";
+            const isRed = idx % 2 === 0;
+            div.innerHTML = createSockSVG(
+                48, 56,
+                isRed ? "#c82323" : "#1f7a4c",
+                "#fbf6eb",
+                isRed ? "#1f7a4c" : "#c82323",
+                lbl,
+                idx % 3 === 0 ? "snowflake" : (idx % 3 === 1 ? "stripes" : "dots")
+            );
+            div.addEventListener("click", (e) => burstMagic(e.clientX, e.clientY));
+            rope.appendChild(div);
+        });
+
+        // 2. Chaussettes de la bannière Hero + 6 mini-chaussettes sous le code secret
+        document.getElementById("hero-big-socks").innerHTML =
+            createSockSVG(72, 84, "#c82323", "#ffffff", "#175235", "CHAU7", "stripes");
+
+        const miniMeter = document.getElementById("mini-socks-meter");
+        for (let i = 0; i < 6; i++) {
+            const span = document.createElement("span");
+            span.className = "mini-sock-item";
+            span.innerHTML = createSockSVG(28, 34, i % 2 === 0 ? "#c82323" : "#175235", "#fde68a", "#f5b041", "", "dots");
+            miniMeter.appendChild(span);
+        }
+
+        const codeInput = document.getElementById("secret-code-input");
+        function updateMiniSocks() {
+            const len = codeInput.value.trim().length;
+            document.querySelectorAll(".mini-sock-item").forEach((el, idx) => {
+                el.classList.toggle("lit", idx < len);
+            });
+        }
+        codeInput.addEventListener("input", updateMiniSocks);
+
+        // Pré-remplissage QR Code (?code=XXXX)
+        const qrCode = new URLSearchParams(window.location.search).get("code");
+        if (qrCode) {
+            codeInput.value = qrCode.trim().toUpperCase();
+            updateMiniSocks();
+        }
+
+        // 3. Compte à rebours dynamique vers le 1er décembre 2026
+        function updateCountdown() {
+            const target = new Date("2026-12-01T08:00:00+01:00").getTime();
+            const now = Date.now();
+            const diff = target - now;
+            const pill = document.getElementById("countdown-pill");
+            if (diff <= 0) {
+                pill.textContent = "🎄 L'Avent Chau7 est ouvert !";
+                return;
+            }
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            pill.textContent = `⏳ Ouverture case 1 dans : ${d}j ${h}h ${m}m ${s}s`;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // 4. Génération des 19 cases chaussettes
+        const grid = document.getElementById("calendar-grid");
+        const patterns = ["snowflake", "dots", "stripes"];
+        for (let day = 1; day <= 19; day++) {
+            const card = document.createElement("article");
+            card.className = "day-card locked";
+            card.dataset.day = day;
+            const sockSvg = createSockSVG(
+                62, 72,
+                day % 2 === 0 ? "#c82323" : "#b91c1c",
+                "#fbf6eb",
+                "#f5b041",
+                "",
+                patterns[day % 3]
+            );
+            card.innerHTML = `
+                <div class="day-top">
+                    <span class="day-number">${day}</span>
+                    <span class="day-date">${day} déc.</span>
+                </div>
+                <div class="day-illustration">${sockSvg}</div>
+                <div class="day-title">Case verrouillée</div>
+                <span class="lock-badge" title="Case verrouillée">🔒</span>
+            `;
+            card.addEventListener("click", (e) => {
+                burstMagic(e.clientX, e.clientY);
+                document.getElementById("modal-day-title").textContent = `🧦 Jour ${day} — ${day} décembre 2026`;
+                if (!document.getElementById("modal-slots-container").innerHTML.trim()) {
+                    document.getElementById("modal-slots-container").innerHTML =
+                        `<p style="color:var(--text-muted);">Les 4 créneaux (matin, midi, aprèm, soir) s'afficheront ici dès que la case sera débloquée !</p>`;
+                }
+                document.getElementById("day-modal").classList.add("open");
+            });
+            grid.appendChild(card);
+        }
+
+        // Easter egg chaussette d'or
+        document.getElementById("golden-sock-btn").addEventListener("click", (e) => burstMagic(e.clientX, e.clientY));
+
+        // Fermeture modale
+        const modal = document.getElementById("day-modal");
+        document.getElementById("btn-close-modal").addEventListener("click", () => modal.classList.remove("open"));
+        modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
+    </script>
+
+    <!-- Scripts Supabase de Thomas -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/calendar.js"></script>
+</body>
+</html>

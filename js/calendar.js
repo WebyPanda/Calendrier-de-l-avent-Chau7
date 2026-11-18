@@ -1,0 +1,318 @@
+const supabaseCal = window.supabaseClient;
+
+// ⚠️ Permet d'activer uniquement le Jour 1 dès aujourd'hui pour visualiser le rendu débloqué.
+// Passe cette variable à `null` une fois les tests terminés pour n'utiliser que la règle J-7.
+const PREVIEW_ACTIVE_DAY = 1;
+
+const SLOT_ORDER = { matin: 1, midi: 2, aprem: 3, soir: 4 };
+const SLOT_LABELS = {
+    matin: "🌅 Matin (08h - 12h)",
+    midi: "☀️ Midi (12h - 14h)",
+    aprem: "🌤️ Aprèm (14h - 18h)",
+    soir: "🌙 Soir (18h - 00h)"
+};
+
+// Événements de démonstration pour le Jour 1 si la table 'advent_events' est encore vide
+const FALLBACK_DAY1_EVENTS = [
+    {
+        day_number: 1,
+        slot: "matin",
+        event_date: "2026-12-01",
+        title: "Petit-déj de lancement Chau7",
+        description: "Distribution gratuite de viennoiseries, café et chocolat chaud pour lancer le calendrier de l'Avent devant le Foyer !",
+        location: "Foyer N7",
+        points_hint: "+20 pts via QR code sur place",
+        is_revealed: true
+    },
+    {
+        day_number: 1,
+        slot: "midi",
+        event_date: "2026-12-01",
+        title: "Défi Chaussette Express",
+        description: "Viens affronter la pré-liste Chau7 au lancer de chaussettes dans la panier de Noël. Les vainqueurs repartent avec un bonus immédiat.",
+        location: "Hall B / Cour N7",
+        points_hint: "+30 pts victoire / +15 pts participation",
+        is_revealed: true
+    },
+    {
+        day_number: 1,
+        slot: "aprem",
+        event_date: "2026-12-01",
+        title: "Code secret en Story Insta",
+        description: "Un indice photo est caché dans l'école et publié sur notre compte Instagram. Trouve le lieu et valide le code secret avant 18h !",
+        location: "Insta @chau7.n7",
+        points_hint: "+25 pts (100 premiers)",
+        is_revealed: true
+    },
+    {
+        day_number: 1,
+        slot: "soir",
+        event_date: "2026-12-01",
+        title: "Soirée Open Crêpes & Vin Chaud",
+        description: "Grande soirée d'ouverture de décembre avec crêpes à volonté, ambiance de Noël et QR code bonus affiché à 21h.",
+        location: "Foyer N7",
+        points_hint: "+40 pts présence soirée",
+        is_revealed: true
+    }
+];
+
+// Calcule la date de l'événement (1er au 19 déc 2026) et sa date d'activation (7 jours avant)
+function getDaySchedule(dayNumber) {
+    const eventDate = new Date(2026, 11, dayNumber, 0, 0, 0);      // Mois 11 = Décembre
+    const unlockDate = new Date(2026, 11, dayNumber - 7, 0, 0, 0); // 1 semaine (7 jours) avant
+    return { eventDate, unlockDate };
+}
+
+function formatFrenchDate(dateObj) {
+    return dateObj.toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+}
+
+// Ouverture de la modale avec événements cliquables pour afficher tous leurs détails
+function openDayModal(dayNumber, dayEvents, isUnlocked, unlockDate) {
+    const modal = document.getElementById("day-modal");
+    const titleEl = document.getElementById("modal-day-title");
+    const container = document.getElementById("modal-slots-container");
+
+    const { eventDate } = getDaySchedule(dayNumber);
+    titleEl.textContent = `🧦 Jour ${dayNumber} — ${formatFrenchDate(eventDate)}`;
+
+    if (!isUnlocked) {
+        container.innerHTML = `
+            <div class="locked-modal-info">
+                <div style="font-size:2.4rem; margin-bottom:0.5rem;">🔒</div>
+                <h3>Cette chaussette est encore fermée !</h3>
+                <p style="margin-top:0.4rem; color:var(--text-muted);">
+                    Conformément aux règles, cette journée s'activera automatiquement <strong>1 semaine avant</strong>, soit le :
+                </p>
+                <div class="unlock-date-badge">📅 ${formatFrenchDate(unlockDate)} à 00h00</div>
+            </div>
+        `;
+        modal.classList.add("open");
+        return;
+    }
+
+    if (!dayEvents || dayEvents.length === 0) {
+        container.innerHTML = `<p style="color:var(--text-muted);">Aucun événement renseigné pour cette journée pour le moment.</p>`;
+        modal.classList.add("open");
+        return;
+    }
+
+    const sorted = [...dayEvents].sort((a, b) => (SLOT_ORDER[a.slot] || 9) - (SLOT_ORDER[b.slot] || 9));
+
+    container.innerHTML = `
+        <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:0.85rem;">
+            👆 Clique sur un événement ci-dessous pour afficher tous ses détails (lieu, description, gain de points).
+        </p>
+        ${sorted.map((ev, index) => `
+            <article class="slot-item clickable-event" data-slot-index="${index}">
+                <div class="slot-item-header">
+                    <span class="slot-tag">${SLOT_LABELS[ev.slot] || ev.slot}</span>
+                    <span class="slot-points">${ev.points_hint || "Points à gagner"}</span>
+                </div>
+                <div class="slot-title-row">
+                    <h4>${ev.title}</h4>
+                    <span class="expand-chevron">Détails ▾</span>
+                </div>
+                <div class="slot-details-drawer">
+                    <p class="slot-desc">${ev.description || "Plus d'informations très bientôt sur @chau7.n7 !"}</p>
+                    <div class="slot-meta-grid">
+                        <span>📍 <strong>Lieu :</strong> ${ev.location || "Campus ENSEEIHT"}</span>
+                        <span>📅 <strong>Date :</strong> ${ev.event_date || `2026-12-${String(dayNumber).padStart(2, "0")}`}</span>
+                    </div>
+                    <div class="slot-action-hint">
+                        🎁 Un code secret ou QR code est distribué sur place ? Rentre-le dans l'encadré en haut de la page !
+                    </div>
+                </div>
+            </article>
+        `).join("")}
+    `;
+
+    // Rend chaque événement cliquable pour déplier/replier ses détails complets
+    container.querySelectorAll(".clickable-event").forEach((card) => {
+        card.addEventListener("click", () => {
+            const wasOpen = card.classList.contains("expanded");
+            container.querySelectorAll(".clickable-event").forEach((c) => c.classList.remove("expanded"));
+            if (!wasOpen) card.classList.add("expanded");
+        });
+    });
+
+    modal.classList.add("open");
+}
+
+// Chargement de la grille des 19 jours depuis Supabase
+async function loadAdventCalendar() {
+    const grid = document.getElementById("calendar-grid");
+    if (!grid) return;
+
+    const { data: eventsData, error } = await supabaseCal
+        .from("advent_events")
+        .select("day_number, slot, event_date, title, description, location, points_hint, is_revealed");
+
+    const eventsByDay = {};
+    if (!error && eventsData) {
+        eventsData.forEach((ev) => {
+            if (!eventsByDay[ev.day_number]) eventsByDay[ev.day_number] = [];
+            eventsByDay[ev.day_number].push(ev);
+        });
+    }
+
+    // Si la table Supabase n'a pas encore d'événements pour le Jour 1, on injecte l'aperçu
+    if (!eventsByDay[1] || eventsByDay[1].length === 0) {
+        eventsByDay[1] = FALLBACK_DAY1_EVENTS;
+    }
+
+    const now = new Date();
+    const patterns = ["snowflake", "dots", "stripes"];
+    grid.innerHTML = "";
+
+    for (let day = 1; day <= 19; day++) {
+        const { eventDate, unlockDate } = getDaySchedule(day);
+        const dayEvents = eventsByDay[day] || [];
+        const hasRevealedEvent = dayEvents.some((e) => e.is_revealed === true);
+
+        // Règle : actif 1 semaine (7 jours) avant le jour J, ou si is_revealed = true, ou si jour d'aperçu
+        const isUnlocked = (now >= unlockDate) || hasRevealedEvent || (day === PREVIEW_ACTIVE_DAY);
+        const isToday = now.toDateString() === eventDate.toDateString();
+
+        const card = document.createElement("article");
+        card.className = `day-card ${isUnlocked ? "unlocked" : "locked"} ${isToday ? "today" : ""}`;
+        card.dataset.day = day;
+
+        const sockSvg = window.createSockSVG(
+            62, 72,
+            isUnlocked ? "#c82323" : "#991b1b",
+            "#fbf6eb",
+            isUnlocked ? "#175235" : "#f5b041",
+            isUnlocked ? "OUVERT" : "",
+            patterns[day % 3]
+        );
+
+        if (isUnlocked) {
+            const firstTitle = dayEvents[0]?.title || "Événements débloqués";
+            const badgesHtml = dayEvents
+                .sort((a, b) => (SLOT_ORDER[a.slot] || 9) - (SLOT_ORDER[b.slot] || 9))
+                .map((ev) => `<span class="badge">${ev.slot}</span>`)
+                .join("");
+
+            card.innerHTML = `
+                <div class="day-top">
+                    <span class="day-number">${day}</span>
+                    <span class="day-date">${day} déc. • Actif</span>
+                </div>
+                <div class="day-illustration">${sockSvg}</div>
+                <div class="day-title">${firstTitle}</div>
+                <div class="slot-badges">${badgesHtml || '<span class="badge">Voir</span>'}</div>
+            `;
+        } else {
+            const unlockShort = unlockDate.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+            card.innerHTML = `
+                <div class="day-top">
+                    <span class="day-number">${day}</span>
+                    <span class="day-date">${day} déc.</span>
+                </div>
+                <div class="day-illustration">${sockSvg}</div>
+                <div class="day-title">Actif dès le ${unlockShort}</div>
+                <span class="lock-badge" title="Déblocage 7 jours avant">🔒</span>
+            `;
+        }
+
+        card.addEventListener("click", (e) => {
+            if (window.burstMagic) window.burstMagic(e.clientX, e.clientY);
+            openDayModal(day, dayEvents, isUnlocked, unlockDate);
+        });
+
+        grid.appendChild(card);
+    }
+}
+
+// Validation d'un code secret / QR code via fonction RPC sécurisée
+const codeForm = document.getElementById("secret-code-form");
+if (codeForm) {
+    codeForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const msgBox = document.getElementById("code-message");
+        const input = document.getElementById("secret-code-input");
+        const btn = document.getElementById("btn-submit-code");
+        const codeValue = input.value.trim().toUpperCase();
+
+        if (!codeValue) return;
+
+        const { data: { session } } = await supabaseCal.auth.getSession();
+        if (!session) {
+            msgBox.textContent = "Connecte-toi d'abord à ton compte pour enregistrer tes points !";
+            msgBox.className = "alert-box error";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Vérification...";
+
+        try {
+            // Appel de la fonction RPC PostgreSQL côté Supabase
+            const { data, error } = await supabaseCal.rpc("redeem_secret_code", {
+                input_code: codeValue
+            });
+
+            if (error) {
+                msgBox.textContent = error.message || "Code invalide, expiré ou déjà utilisé.";
+                msgBox.className = "alert-box error";
+            } else {
+                msgBox.textContent = data?.message || `Bravo ! Code ${codeValue} validé, tes points ont été ajoutés ! 🎉`;
+                msgBox.className = "alert-box success";
+                input.value = "";
+                if (window.refreshUserNavbar) await window.refreshUserNavbar();
+                await loadSidebarWidgets();
+            }
+        } catch (err) {
+            msgBox.textContent = "Erreur lors de la validation du code.";
+            msgBox.className = "alert-box error";
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Valider 🧦";
+        }
+    });
+}
+
+// Chargement du mini-podium et des derniers logs dans la barre latérale de accueil.html
+async function loadSidebarWidgets() {
+    const top1El = document.getElementById("sidebar-top1");
+    if (!top1El) return;
+
+    const { data: topUsers } = await supabaseCal
+        .from("profiles")
+        .select("identifiant, points")
+        .order("points", { ascending: false })
+        .limit(3);
+
+    if (topUsers) {
+        if (topUsers[0]) document.getElementById("sidebar-top1").textContent = `${topUsers[0].identifiant} (${topUsers[0].points})`;
+        if (topUsers[1]) document.getElementById("sidebar-top2").textContent = `${topUsers[1].identifiant} (${topUsers[1].points})`;
+        if (topUsers[2]) document.getElementById("sidebar-top3").textContent = `${topUsers[2].identifiant} (${topUsers[2].points})`;
+    }
+
+    const logsList = document.getElementById("sidebar-logs-list");
+    const { data: logs } = await supabaseCal
+        .from("point_logs")
+        .select("reason, points_delta, profiles(identifiant)")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+    if (logs && logs.length > 0 && logsList) {
+        logsList.innerHTML = logs.map((log) => `
+            <li class="log-item">
+                <span><strong>${log.profiles?.identifiant || "Joueur"}</strong> — ${log.reason}</span>
+                <span class="log-points">+${log.points_delta} pts 🧦</span>
+            </li>
+        `).join("");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadAdventCalendar();
+    loadSidebarWidgets();
+});

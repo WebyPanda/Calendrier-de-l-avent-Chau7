@@ -73,7 +73,6 @@
             </div>
         </div>
 
-        <!-- Vague de neige & sapins en bas de bannière -->
         <svg class="snow-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
             <path fill="#f4f6f2" d="M0,32 C240,64 480,0 720,32 C960,64 1200,10 1440,36 L1440,60 L0,60 Z"></path>
         </svg>
@@ -85,7 +84,7 @@
             <div>
                 <div class="calendar-header">
                     <h2>🧦 Les 19 chaussettes de décembre</h2>
-                    <span style="font-size:0.86rem; color:var(--text-muted);">Clique sur une case pour voir les 4 créneaux</span>
+                    <span style="font-size:0.86rem; color:var(--text-muted);">Clique sur une case active pour voir ses événements</span>
                 </div>
                 <section id="calendar-grid" class="calendar-grid"></section>
             </div>
@@ -145,8 +144,8 @@
     </footer>
 
     <script>
-        // Générateur de chaussette SVG tricotée personnalisable
-        function createSockSVG(width, height, bodyColor, cuffColor, heelColor, labelText, patternType) {
+        // Générateur de chaussette SVG tricotée (rendu global pour js/calendar.js)
+        window.createSockSVG = function(width, height, bodyColor, cuffColor, heelColor, labelText, patternType) {
             let pattern = "";
             if (patternType === "stripes") {
                 pattern = `<line x1="25" y1="28" x2="51" y2="28" stroke="#fff" stroke-width="3"/>
@@ -171,10 +170,10 @@
                     ${label}
                 </svg>
             `;
-        }
+        };
 
-        // Animation pluie festive au clic
-        function burstMagic(x, y) {
+        // Animation pluie festive au clic (rendue globale pour js/calendar.js)
+        window.burstMagic = function(x, y) {
             const icons = ["🧦", "🎄", "⭐", "❄", "🎁"];
             for (let i = 0; i < 12; i++) {
                 const el = document.createElement("span");
@@ -189,7 +188,7 @@
                 document.body.appendChild(el);
                 setTimeout(() => el.remove(), 1000);
             }
-        }
+        };
 
         // 1. Remplir la guirlande des filières N7
         const garlandLabels = ["CHAU7", "SN", "3EA", "MF2E", "FISA", "CHAU7", "N7", "3EA", "SN", "MF2E"];
@@ -198,7 +197,7 @@
             const div = document.createElement("div");
             div.className = "hanging-sock";
             const isRed = idx % 2 === 0;
-            div.innerHTML = createSockSVG(
+            div.innerHTML = window.createSockSVG(
                 48, 56,
                 isRed ? "#c82323" : "#1f7a4c",
                 "#fbf6eb",
@@ -206,19 +205,19 @@
                 lbl,
                 idx % 3 === 0 ? "snowflake" : (idx % 3 === 1 ? "stripes" : "dots")
             );
-            div.addEventListener("click", (e) => burstMagic(e.clientX, e.clientY));
+            div.addEventListener("click", (e) => window.burstMagic(e.clientX, e.clientY));
             rope.appendChild(div);
         });
 
         // 2. Chaussettes de la bannière Hero + 6 mini-chaussettes sous le code secret
         document.getElementById("hero-big-socks").innerHTML =
-            createSockSVG(72, 84, "#c82323", "#ffffff", "#175235", "CHAU7", "stripes");
+            window.createSockSVG(72, 84, "#c82323", "#ffffff", "#175235", "CHAU7", "stripes");
 
         const miniMeter = document.getElementById("mini-socks-meter");
         for (let i = 0; i < 6; i++) {
             const span = document.createElement("span");
             span.className = "mini-sock-item";
-            span.innerHTML = createSockSVG(28, 34, i % 2 === 0 ? "#c82323" : "#175235", "#fde68a", "#f5b041", "", "dots");
+            span.innerHTML = window.createSockSVG(28, 34, i % 2 === 0 ? "#c82323" : "#175235", "#fde68a", "#f5b041", "", "dots");
             miniMeter.appendChild(span);
         }
 
@@ -257,52 +256,15 @@
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
-        // 4. Génération des 19 cases chaussettes
-        const grid = document.getElementById("calendar-grid");
-        const patterns = ["snowflake", "dots", "stripes"];
-        for (let day = 1; day <= 19; day++) {
-            const card = document.createElement("article");
-            card.className = "day-card locked";
-            card.dataset.day = day;
-            const sockSvg = createSockSVG(
-                62, 72,
-                day % 2 === 0 ? "#c82323" : "#b91c1c",
-                "#fbf6eb",
-                "#f5b041",
-                "",
-                patterns[day % 3]
-            );
-            card.innerHTML = `
-                <div class="day-top">
-                    <span class="day-number">${day}</span>
-                    <span class="day-date">${day} déc.</span>
-                </div>
-                <div class="day-illustration">${sockSvg}</div>
-                <div class="day-title">Case verrouillée</div>
-                <span class="lock-badge" title="Case verrouillée">🔒</span>
-            `;
-            card.addEventListener("click", (e) => {
-                burstMagic(e.clientX, e.clientY);
-                document.getElementById("modal-day-title").textContent = `🧦 Jour ${day} — ${day} décembre 2026`;
-                if (!document.getElementById("modal-slots-container").innerHTML.trim()) {
-                    document.getElementById("modal-slots-container").innerHTML =
-                        `<p style="color:var(--text-muted);">Les 4 créneaux (matin, midi, aprèm, soir) s'afficheront ici dès que la case sera débloquée !</p>`;
-                }
-                document.getElementById("day-modal").classList.add("open");
-            });
-            grid.appendChild(card);
-        }
-
-        // Easter egg chaussette d'or
-        document.getElementById("golden-sock-btn").addEventListener("click", (e) => burstMagic(e.clientX, e.clientY));
-
-        // Fermeture modale
+        // Easter egg chaussette d'or + fermeture modale
+        document.getElementById("golden-sock-btn").addEventListener("click", (e) => window.burstMagic(e.clientX, e.clientY));
         const modal = document.getElementById("day-modal");
         document.getElementById("btn-close-modal").addEventListener("click", () => modal.classList.remove("open"));
         modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
     </script>
 
-    <!-- Scripts Supabase de Thomas -->
+    <!-- Scripts Supabase (supabaseClient.js doit être chargé en premier) -->
+    <script src="../js/supabaseClient.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/calendar.js"></script>
 </body>

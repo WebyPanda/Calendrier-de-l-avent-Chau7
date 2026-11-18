@@ -16,9 +16,14 @@
             <a href="regles.html">Règles</a>
         </div>
         <div class="nav-right">
-            <div class="guest-links">
+            <div id="nav-guest" class="guest-links">
                 <a href="login.html">Connexion</a>
                 <a href="register.html" class="btn-register-nav">Inscription</a>
+            </div>
+            <div id="nav-user" class="user-pill" style="display:none;">
+                <span>🎅 <strong id="user-identifiant">Joueur</strong> (<span id="user-filiere">-</span>)</span>
+                <span>🏆 <strong id="user-points">0</strong> pts 🧦</span>
+                <button type="button" id="btn-logout" class="btn-logout">Déconnexion</button>
             </div>
         </div>
     </nav>
@@ -45,6 +50,7 @@
     </div>
 
     <footer>Pré-liste Chau7 — Toulouse INP-ENSEEIHT 🎄🧦</footer>
+    <script src="../js/supabaseClient.js"></script>
     <script src="../js/auth.js"></script>
 </body>
 </html>

@@ -3,67 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chargement - Calendrier de l'Avent Chau7</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Chargement — Calendrier de l'Avent Chau7</title>
     <style>
-        body { margin: 0; padding: 0; height: 100vh; background: #0f291c; color: #fff; font-family: 'Montserrat', sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        
-        /* Rideau vert unique */
-        .curtain {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: linear-gradient(135deg, #1f7a4c 0%, #155536 50%, #0f291c 100%);
-            z-index: 1000;
-            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
-            border-left: 10px solid #f5b041;
-            border-right: 10px solid #f5b041;
+        :root {
+            --pine-dark: #103c26;
+            --pine-deep: #082014;
+            --pine: #175235;
+            --red: #a61c1c;
+            --red-bright: #c82323;
+            --gold: #d98a1c;
+            --gold-bright: #f5b041;
+            --gold-light: #fde68a;
+            --cream: #fbf6eb;
         }
-        
 
-        body.open-curtains .curtain { transform: scaleX(0); }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        .loader-wrapper { text-align: center; z-index: 1001; max-width: 90%; width: 500px; padding: 2rem; transition: opacity 0.6s ease; }
-        h1 { font-size: 1.8rem; color: #fde68a; margin-bottom: 0.5rem; }
-        .candy-scene { perspective: 600px; margin: 2rem auto; width: 200px; height: 80px; display: flex; justify-content: center; align-items: center; }
-        .horizontal-cane-container { width: 180px; height: 30px; animation: spin 3s infinite linear; display: flex; align-items: center; justify-content: space-between; }
-        .candy-bar { width: 100%; height: 15px; background: repeating-linear-gradient(45deg, #c82323, #c82323 10px, #fff 10px, #fff 20px); border-radius: 8px; }
-        .sock-tip { font-size: 1.5rem; }
-        
-        @keyframes spin { 100% { transform: rotateX(360deg); } }
-        .progress-bar-container { width: 100%; background: rgba(255,255,255,0.2); border-radius: 10px; height: 10px; margin-top: 1.5rem; }
-        .progress-bar-fill { height: 100%; width: 0%; background: #f5b041; border-radius: 10px; transition: width 0.2s linear; }
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: radial-gradient(circle at 50% 42%, #1d6340 0%, var(--pine-dark) 52%, var(--pine-deep) 100%);
+            color: var(--cream);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- Halo chaleureux derrière la chaussette --- */
+        .hearth-glow {
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245, 176, 65, 0.24) 0%, rgba(200, 35, 35, 0.08) 45%, transparent 72%);
+            filter: blur(18px);
+            animation: pulseGlow 3s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.94); opacity: 0.75; }
+            100% { transform: scale(1.08); opacity: 1; }
+        }
+
+        /* --- Neige douce & étincelles --- */
+        .snow-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .flake {
+            position: absolute;
+            top: -8%;
+            color: rgba(255, 255, 255, 0.75);
+            text-shadow: 0 0 6px rgba(253, 230, 138, 0.4);
+            animation: snowFall linear infinite;
+            user-select: none;
+        }
+
+        @keyframes snowFall {
+            0% { transform: translateY(-10vh) rotate(0deg); }
+            100% { transform: translateY(112vh) rotate(360deg); }
+        }
+
+        /* --- Petite guirlande de chaussettes en haut --- */
+        .top-garland {
+            position: fixed;
+            top: -4px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            border-top: 3px dashed rgba(245, 176, 65, 0.55);
+            padding: 0 4%;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .mini-hanging {
+            transform-origin: top center;
+            animation: gentleSway 3.2s ease-in-out infinite alternate;
+            filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35));
+        }
+
+        .mini-hanging:nth-child(even) {
+            animation-duration: 3.9s;
+            animation-direction: alternate-reverse;
+            margin-top: 5px;
+        }
+
+        @keyframes gentleSway {
+            0% { transform: rotate(-6deg); }
+            100% { transform: rotate(6deg); }
+        }
+
+        /* --- Double rideau de théâtre vert & or --- */
+        .curtain {
+            position: fixed;
+            top: 0;
+            width: 50.5vw;
+            height: 100vh;
+            z-index: 20;
+            pointer-events: none;
+            transition: transform 1.15s cubic-bezier(0.77, 0, 0.175, 1);
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .curtain-left {
+            left: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                #12442b 0px,
+                #1a5c3b 28px,
+                #0e3521 56px
+            );
+            border-right: 4px solid var(--gold-bright);
+        }
+
+        .curtain-right {
+            right: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                #0e3521 0px,
+                #1a5c3b 28px,
+                #12442b 56px
+            );
+            border-left: 4px solid var(--gold-bright);
+        }
+
+        body.open-curtains .curtain-left {
+            transform: translateX(-102%);
+        }
+
+        body.open-curtains .curtain-right {
+            transform: translateX(102%);
+        }
+
+        /* --- Carte centrale --- */
+        .loader-card {
+            position: relative;
+            z-index: 30;
+            width: 90%;
+            max-width: 430px;
+            padding: 2.1rem 1.8rem 1.9rem;
+            border-radius: 26px;
+            background: rgba(11, 43, 27, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(245, 176, 65, 0.45);
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            text-align: center;
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+
+        body.open-curtains .loader-card {
+            opacity: 0;
+            transform: scale(0.94) translateY(-10px);
+        }
+
+        .school-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            background: rgba(245, 176, 65, 0.16);
+            border: 1px solid rgba(245, 176, 65, 0.4);
+            padding: 0.28rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 0.8rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        h1 span {
+            color: var(--gold-bright);
+        }
+
+        /* --- Grande Chaussette SVG animée --- */
+        .sock-stage {
+            position: relative;
+            width: 170px;
+            height: 195px;
+            margin: 1.1rem auto 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-sock-svg {
+            width: 155px;
+            height: 185px;
+            transform-origin: 50% 8%;
+            animation: sockPendulum 2.6s ease-in-out infinite alternate;
+            filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.45));
+        }
+
+        @keyframes sockPendulum {
+            0% { transform: rotate(-4deg) translateY(0px); }
+            100% { transform: rotate(4deg) translateY(-4px); }
+        }
+
+        /* --- Texte d'étape & Barre de progression dorée --- */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+            margin-bottom: 0.55rem;
+            padding: 0 0.2rem;
+        }
+
+        #loading-sentence {
+            color: rgba(251, 246, 235, 0.92);
+            font-weight: 600;
+            transition: opacity 0.25s ease;
+        }
+
+        #loading-percent {
+            color: var(--gold-bright);
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            overflow: hidden;
+            padding: 2px;
+            border: 1px solid rgba(245, 176, 65, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--red-bright), var(--gold-bright), var(--gold-light));
+            box-shadow: 0 0 12px rgba(245, 176, 65, 0.7);
+            transition: width 0.12s ease-out;
+        }
+
+        /* --- Particules de célébration à 100% --- */
+        .celebrate-pop {
+            position: fixed;
+            z-index: 40;
+            font-size: 1.35rem;
+            pointer-events: none;
+            animation: popOut 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes popOut {
+            0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+            100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(25deg); }
+        }
+
+        /* --- Bouton discret Passer l'intro --- */
+        .skip-btn {
+            position: fixed;
+            bottom: 1.2rem;
+            right: 1.2rem;
+            z-index: 35;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(251, 246, 235, 0.85);
+            border: 1px solid rgba(245, 176, 65, 0.35);
+            padding: 0.45rem 0.95rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            backdrop-filter: blur(6px);
+            transition: all 0.2s;
+        }
+
+        .skip-btn:hover {
+            background: var(--gold-bright);
+            color: var(--pine-dark);
+        }
     </style>
 </head>
 <body>
-    <div class="curtain"></div>
-    <div class="loader-wrapper" id="loader-wrapper">
-        <h1>🎄 Calendrier Chau7 🧦</h1>
-        <p id="loading-sentence">Initialisation...</p>
-        <div class="candy-scene">
-            <div class="horizontal-cane-container">
-                <span class="sock-tip">🧦</span>
-                <div class="candy-bar"></div>
-                <span class="sock-tip">🧦</span>
-            </div>
+    <!-- Halo chaud & Flocons -->
+    <div class="hearth-glow" aria-hidden="true"></div>
+    <div class="snow-layer" id="snow-layer" aria-hidden="true"></div>
+
+    <!-- Guirlande de mini-chaussettes -->
+    <div class="top-garland" id="top-garland" aria-hidden="true"></div>
+
+    <!-- Double rideau -->
+    <div class="curtain curtain-left"></div>
+    <div class="curtain curtain-right"></div>
+
+    <!-- Carte principale de chargement -->
+    <main class="loader-card" id="loader-card">
+        <div class="school-tag">Toulouse INP — ENSEEIHT</div>
+        <h1>Calendrier <span>Chau7</span></h1>
+
+        <!-- Grande chaussette tricotée qui se remplit avec la progression -->
+        <div class="sock-stage" id="sock-stage">
+            <svg class="hero-sock-svg" viewBox="0 0 120 145" aria-label="Chaussette de Noël Chau7">
+                <defs>
+                    <!-- Forme intérieure de la chaussette -->
+                    <path id="sock-body-shape" d="M36 22 H78 V72 C78 93 99 99 99 117 C99 132 81 138 60 138 C39 138 33 123 36 105 L36 22 Z"/>
+                    <!-- Masque de remplissage progressif (remonte de y=140 à y=20) -->
+                    <clipPath id="sock-fill-clip">
+                        <rect id="sock-fill-rect" x="0" y="140" width="120" height="125"/>
+                    </clipPath>
+                </defs>
+
+                <!-- Boucle d'accroche dorée -->
+                <path d="M38 14 C32 4, 48 2, 48 14" fill="none" stroke="#f5b041" stroke-width="4" stroke-linecap="round"/>
+
+                <!-- Fond de chaussette non encore rempli (laine sombre) -->
+                <use href="#sock-body-shape" fill="#184d33" stroke="#082014" stroke-width="3.5"/>
+
+                <!-- Partie remplie (rouge festif + motifs tricotés) -->
+                <g clip-path="url(#sock-fill-clip)">
+                    <use href="#sock-body-shape" fill="#c82323"/>
+                    <!-- Rayures tricotées -->
+                    <line x1="36" y1="46" x2="78" y2="46" stroke="#fbf6eb" stroke-width="4" stroke-dasharray="4 3"/>
+                    <line x1="36" y1="56" x2="78" y2="56" stroke="#f5b041" stroke-width="3.5"/>
+                    <!-- Flocon central -->
+                    <text x="57" y="84" text-anchor="middle" fill="#fbf6eb" font-size="22">❄</text>
+                    <!-- Talon et bout de pied dorés -->
+                    <path d="M78 88 C90 88 98 99 98 111 C90 111 80 103 78 88 Z" fill="#f5b041"/>
+                    <path d="M36 104 C47 106 53 119 49 136 C37 133 34 119 36 104 Z" fill="#175235"/>
+                </g>
+
+                <!-- Contour extérieur et surpiqûres blanches -->
+                <use href="#sock-body-shape" fill="none" stroke="#082014" stroke-width="3.5"/>
+                <use href="#sock-body-shape" fill="none" stroke="rgba(251,246,235,0.45)" stroke-width="1.5" stroke-dasharray="3 3" transform="scale(0.92) translate(5, 6)"/>
+
+                <!-- Revers en laine crème en haut de la chaussette -->
+                <rect x="30" y="13" width="54" height="21" rx="8" fill="#fbf6eb" stroke="#082014" stroke-width="3"/>
+                <line x1="34" y1="18" x2="80" y2="18" stroke="#d98a1c" stroke-width="1.5" stroke-dasharray="3 2"/>
+                <text x="57" y="27.5" text-anchor="middle" fill="#103c26" font-size="11.5" font-weight="900" letter-spacing="0.8">CHAU7</text>
+            </svg>
         </div>
-        <div class="progress-bar-container"><div class="progress-bar-fill" id="progress-fill"></div></div>
-    </div>
+
+        <!-- Texte dynamique + pourcentage -->
+        <div class="status-row">
+            <span id="loading-sentence">Tricotage de ta chaussette...</span>
+            <span id="loading-percent">0%</span>
+        </div>
+
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+    </main>
+
+    <a href="html/portail.html" class="skip-btn">Passer l'intro →</a>
+
     <script>
-        const sentences = ["Tricotage en cours...", "Chauffage du vin chaud...", "Chargement des points...", "Remplissage des chaussettes...", "Installation des guirlandes..."];
-        document.getElementById('loading-sentence').textContent = sentences[Math.floor(Math.random() * sentences.length)];
+        // 1. Génération des flocons légers
+        const snowLayer = document.getElementById("snow-layer");
+        const flakes = ["❄", "❅", "❆", "•"];
+        for (let i = 0; i < 22; i++) {
+            const span = document.createElement("span");
+            span.className = "flake";
+            span.textContent = flakes[i % flakes.length];
+            span.style.left = (Math.random() * 100) + "%";
+            span.style.fontSize = (0.7 + Math.random() * 0.85) + "rem";
+            span.style.animationDuration = (7 + Math.random() * 8) + "s";
+            span.style.animationDelay = (-Math.random() * 10) + "s";
+            snowLayer.appendChild(span);
+        }
+
+        // 2. Petite guirlande de chaussettes suspendues en haut
+        const garland = document.getElementById("top-garland");
+        const count = window.innerWidth < 600 ? 6 : 10;
+        for (let i = 0; i < count; i++) {
+            const item = document.createElement("div");
+            item.className = "mini-hanging";
+            const isRed = i % 2 === 0;
+            item.innerHTML = `
+                <svg width="34" height="42" viewBox="0 0 80 95">
+                    <path d="M24 12 H52 V46 C52 60 66 64 66 76 C66 86 54 90 40 90 C26 90 22 80 24 68 L24 12 Z"
+                          fill="${isRed ? "#c82323" : "#1f7a4c"}" stroke="#082014" stroke-width="3"/>
+                    <path d="M52 58 C60 58 65 65 65 73 C60 73 53 68 52 58 Z" fill="#f5b041"/>
+                    <rect x="20" y="6" width="36" height="14" rx="5" fill="#fbf6eb" stroke="#082014" stroke-width="2.5"/>
+                </svg>
+            `;
+            garland.appendChild(item);
+        }
+
+        // 3. Jaillissement d'étoiles et cadeaux à 100%
+        function celebrateSockFull() {
+            const stage = document.getElementById("sock-stage").getBoundingClientRect();
+            const cx = stage.left + stage.width / 2;
+            const cy = stage.top + stage.height * 0.35;
+            const icons = ["🧦", "🎁", "⭐", "🎄", "✨"];
+            for (let i = 0; i < 14; i++) {
+                const p = document.createElement("span");
+                p.className = "celebrate-pop";
+                p.textContent = icons[i % icons.length];
+                p.style.left = cx + "px";
+                p.style.top = cy + "px";
+                const angle = (-Math.PI * 0.85) + (Math.PI * 0.7 * (i / 13));
+                const dist = 70 + Math.random() * 65;
+                p.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+                p.style.setProperty("--dy", Math.sin(angle) * dist + "px");
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+        }
+
+        // 4. Progression synchronisée entre la barre, le pourcentage et le remplissage de la chaussette
+        const steps = [
+            { at: 0,  text: "Tricotage de ta chaussette en laine..." },
+            { at: 28, text: "Chauffage du chocolat chaud au Foyer..." },
+            { at: 58, text: "Accrochage des 19 cases de l'N7..." },
+            { at: 84, text: "Remplissage des cadeaux surprises..." }
+        ];
+
+        const fillBar = document.getElementById("progress-fill");
+        const percentText = document.getElementById("loading-percent");
+        const sentenceEl = document.getElementById("loading-sentence");
+        const sockFillRect = document.getElementById("sock-fill-rect");
+
         let progress = 0;
+        let currentStep = 0;
+
         const timer = setInterval(() => {
             progress += 2;
-            document.getElementById('progress-fill').style.width = progress + '%';
+            if (progress > 100) progress = 100;
+
+            fillBar.style.width = progress + "%";
+            percentText.textContent = progress + "%";
+
+            // Remonte le masque SVG de y=140 (vide) à y=20 (plein)
+            const newY = 140 - (progress / 100) * 120;
+            sockFillRect.setAttribute("y", newY.toFixed(1));
+
+            // Mise à jour fluide de la phrase
+            if (currentStep + 1 < steps.length && progress >= steps[currentStep + 1].at) {
+                currentStep++;
+                sentenceEl.textContent = steps[currentStep].text;
+            }
+
             if (progress >= 100) {
                 clearInterval(timer);
-                document.body.classList.add('show-split');
+                sentenceEl.textContent = "C'est prêt ! Bienvenue à l'N7 🎄";
+                celebrateSockFull();
+
                 setTimeout(() => {
-                    document.body.classList.add('open-curtains');
-                    document.getElementById('loader-wrapper').style.opacity = '0';
-                    setTimeout(() => window.location.href = 'html/portail.html', 1200);
-                }, 400);
+                    document.body.classList.add("open-curtains");
+                    setTimeout(() => {
+                        window.location.href = "html/portail.html";
+                    }, 1050);
+                }, 450);
             }
-        }, 120);
+        }, 100); // ~2,8s de remplissage + 1,5s d'ouverture des rideaux
     </script>
 </body>
 </html>

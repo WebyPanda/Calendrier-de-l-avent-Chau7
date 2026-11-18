@@ -1,0 +1,184 @@
+-- 1. Table des profils (avec suivi de la streak)
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  prenom TEXT NOT NULL,
+  nom TEXT NOT NULL,
+  filiere TEXT NOT NULL,
+  pseudo TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  points INT DEFAULT 0,
+  current_streak INT DEFAULT 0,
+  last_checkin_date DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Table des événements (code secret et points intégrés + expiration à minuit)
+CREATE TABLE advent_events (
+  day_number INT CHECK (day_number BETWEEN 1 AND 19),
+  slot TEXT CHECK (slot IN ('matin', 'midi', 'aprem', 'soir')),
+  PRIMARY KEY (day_number, slot),
+  event_date DATE GENERATED ALWAYS AS (('2026-12-01'::date + (day_number - 1))) STORED,
+  title TEXT NOT NULL,
+  description TEXT,
+  location TEXT,
+  points_hint TEXT,
+  secret_code TEXT UNIQUE NOT NULL,
+  points_reward INT NOT NULL DEFAULT 0,
+  is_revealed BOOLEAN DEFAULT FALSE
+);
+
+-- 3. Table des logs de points (historique transparent + anti-doublon)
+CREATE TABLE point_logs (
+  id SERIAL PRIMARY KEY,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  event_code TEXT, -- Stocke le code de l'event (NULL si check-in streak ou gain manuel)
+  reason TEXT NOT NULL,
+  points_delta INT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, event_code) -- Empêche de valider 2 fois le même event
+);
+
+-- 4. Triggers (Création profil + Mise à jour auto des points)
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, prenom, nom, filiere, pseudo, email)
+  VALUES (
+    new.id,
+    COALESCE(new.raw_user_meta_data->>'prenom', 'Étudiant'),
+    COALESCE(new.raw_user_meta_data->>'nom', 'N7'),
+    COALESCE(new.raw_user_meta_data->>'filiere', 'Autre'),
+    COALESCE(new.raw_user_meta_data->>'pseudo', split_part(new.email, '@', 1)),
+    new.email
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+CREATE OR REPLACE FUNCTION public.update_profile_points()
+RETURNS trigger AS $$
+BEGIN
+  UPDATE public.profiles
+  SET points = points + new.points_delta
+  WHERE id = new.user_id;
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_point_log_inserted
+AFTER INSERT ON public.point_logs FOR EACH ROW EXECUTE PROCEDURE public.update_profile_points();
+
+-- 5. Sécurité RLS (On masque secret_code au public pour éviter la triche dans l'inspecteur)
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public profiles" ON profiles FOR SELECT USING (true);
+
+ALTER TABLE advent_events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public events" ON advent_events FOR SELECT USING (true);
+-- ⚠️ Important : on retire le droit de lecture sur la colonne secret_code pour le rôle public/anon
+REVOKE SELECT (secret_code) ON advent_events FROM anon, authenticated;
+
+ALTER TABLE point_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public logs" ON point_logs FOR SELECT USING (true);
+
+-- 6. Fonction RPC 1 : Valider le code d'un event (valable uniquement le jour même jusqu'à 23h59)
+CREATE OR REPLACE FUNCTION claim_event_code(input_code TEXT)
+RETURNS JSON AS $$
+DECLARE
+  v_event RECORD;
+  v_user_id UUID := auth.uid();
+  v_today DATE := (NOW() AT TIME ZONE 'Europe/Paris')::date;
+BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN json_build_object('success', false, 'message', 'Connecte-toi d''abord pour récupérer tes points !');
+  END IF;
+
+  SELECT * INTO v_event FROM advent_events WHERE UPPER(secret_code) = UPPER(TRIM(input_code));
+  IF NOT FOUND THEN
+    RETURN json_build_object('success', false, 'message', 'Code invalide ou inexistant ❌');
+  END IF;
+
+  -- Vérification stricte : uniquement le jour même (expire à minuit)
+  IF v_event.event_date <> v_today THEN
+    IF v_event.event_date < v_today THEN
+      RETURN json_build_object('success', false, 'message', 'Trop tard ! Ce code a expiré ⏳');
+    ELSE
+      RETURN json_build_object('success', false, 'message', 'Patience, cet événement n''a pas encore eu lieu !');
+    END IF;
+  END IF;
+
+  BEGIN
+    INSERT INTO point_logs (user_id, event_code, reason, points_delta)
+    VALUES (v_user_id, v_event.secret_code, 'Event : ' || v_event.title, v_event.points_reward);
+  EXCEPTION WHEN unique_violation THEN
+    RETURN json_build_object('success', false, 'message', 'Tu as déjà validé le code de cet event ! 👀');
+  END;
+
+  RETURN json_build_object(
+    'success', true,
+    'message', '+' || v_event.points_reward || ' pts gagnés pour "' || v_event.title || '" ! 🔥',
+    'points', v_event.points_reward
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 7. Fonction RPC 2 : Check-in quotidien (Streak progressive = 100 pts sur 19 jours)
+CREATE OR REPLACE FUNCTION daily_checkin()
+RETURNS JSON AS $$
+DECLARE
+  v_user_id UUID := auth.uid();
+  v_profile RECORD;
+  v_today DATE := (NOW() AT TIME ZONE 'Europe/Paris')::date;
+  v_new_streak INT;
+  v_reward INT;
+BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN json_build_object('success', false, 'message', 'Connecte-toi pour faire ton check-in !');
+  END IF;
+
+  -- Vérifie qu'on est bien entre le 1er et le 19 décembre 2026
+  IF v_today < '2026-12-01'::date OR v_today > '2026-12-19'::date THEN
+    RETURN json_build_object('success', false, 'message', 'Le check-in est ouvert du 1er au 19 décembre !');
+  END IF;
+
+  SELECT * INTO v_profile FROM profiles WHERE id = v_user_id;
+
+  IF v_profile.last_checkin_date = v_today THEN
+    RETURN json_build_object('success', false, 'message', 'Check-in déjà validé aujourd''hui ! Reviens demain 🔥');
+  END IF;
+
+  -- Calcul de la série consécutive
+  IF v_profile.last_checkin_date = (v_today - 1) THEN
+    v_new_streak := v_profile.current_streak + 1;
+  ELSE
+    v_new_streak := 1;
+  END IF;
+
+  -- Barème progressif (somme de 1 à 19 = 100 points exactement)
+  v_reward := CASE
+    WHEN v_new_streak BETWEEN 1 AND 5 THEN 2
+    WHEN v_new_streak BETWEEN 6 AND 10 THEN 4
+    WHEN v_new_streak BETWEEN 11 AND 15 THEN 6
+    WHEN v_new_streak BETWEEN 16 AND 18 THEN 9
+    WHEN v_new_streak >= 19 THEN 13
+    ELSE 2
+  END;
+
+  UPDATE profiles
+  SET current_streak = v_new_streak,
+      last_checkin_date = v_today
+  WHERE id = v_user_id;
+
+  INSERT INTO point_logs (user_id, event_code, reason, points_delta)
+  VALUES (v_user_id, NULL, 'Check-in quotidien (Série : ' || v_new_streak || 'j 🔥)', v_reward);
+
+  RETURN json_build_object(
+    'success', true,
+    'message', 'Check-in validé ! Série : ' || v_new_streak || ' jour(s) (+' || v_reward || ' pts) 🔥',
+    'streak', v_new_streak,
+    'points', v_reward
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

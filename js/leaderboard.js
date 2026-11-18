@@ -17,7 +17,7 @@ function renderLeaderboard(filiereFilter = "ALL") {
     tbody.innerHTML = filtered.map((player, index) => `
         <tr>
             <td><strong>#${index + 1}</strong></td>
-            <td>${player.identifiant}</td>
+            <td>${player.pseudo}</td>
             <td><span class="filiere-badge">${player.filiere}</span></td>
             <td><strong>${player.points} pts</strong> 🧦</td>
         </tr>
@@ -27,7 +27,7 @@ function renderLeaderboard(filiereFilter = "ALL") {
 async function initLeaderboardPage() {
     const { data: profiles } = await supabaseLb
         .from("profiles")
-        .select("id, identifiant, filiere, points")
+        .select("id, pseudo, filiere, points")
         .order("points", { ascending: false });
 
     allProfiles = profiles || [];
@@ -36,10 +36,10 @@ async function initLeaderboardPage() {
     [1, 2, 3].forEach((rank) => {
         const p = allProfiles[rank - 1];
         if (!p) return;
-        const idEl = document.getElementById(`top${rank}-identifiant`);
+        const idEl = document.getElementById(`top${rank}-pseudo`);
         const filEl = document.getElementById(`top${rank}-filiere`);
         const ptsEl = document.getElementById(`top${rank}-points`);
-        if (idEl) idEl.textContent = p.identifiant;
+        if (idEl) idEl.textContent = p.pseudo;
         if (filEl) filEl.textContent = p.filiere;
         if (ptsEl) ptsEl.textContent = p.points;
     });
@@ -60,7 +60,7 @@ async function initLeaderboardPage() {
     if (logsList) {
         const { data: logs } = await supabaseLb
             .from("point_logs")
-            .select("reason, points_delta, created_at, profiles(identifiant, filiere)")
+            .select("reason, points_delta, created_at, profiles(pseudo, filiere)")
             .order("created_at", { ascending: false })
             .limit(25);
 
@@ -74,7 +74,7 @@ async function initLeaderboardPage() {
                 return `
                     <li class="log-item">
                         <div>
-                            <strong>${log.profiles?.identifiant || "Joueur"}</strong>
+                            <strong>${log.profiles?.pseudo || "Joueur"}</strong>
                             <span class="filiere-badge">${log.profiles?.filiere || "-"}</span>
                             <div style="color:var(--text-muted); font-size:0.8rem;">${log.reason} • ${dateStr}</div>
                         </div>

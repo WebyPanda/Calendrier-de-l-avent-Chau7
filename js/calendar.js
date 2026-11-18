@@ -6,55 +6,12 @@ const PREVIEW_ACTIVE_DAY = 1;
 
 const SLOT_ORDER = { matin: 1, midi: 2, aprem: 3, soir: 4 };
 const SLOT_LABELS = {
-    matin: "🌅 Matin (08h - 12h)",
+    matin: "🌅 Matin (09h45 - 10h15)",
     midi: "☀️ Midi (12h - 14h)",
-    aprem: "🌤️ Aprèm (14h - 18h)",
+    aprem: "🌤️ Aprèm (15h45 - 16h15)",
     soir: "🌙 Soir (18h - 00h)"
 };
 
-// Événements de démonstration pour le Jour 1 si la table 'advent_events' est encore vide
-const FALLBACK_DAY1_EVENTS = [
-    {
-        day_number: 1,
-        slot: "matin",
-        event_date: "2026-12-01",
-        title: "Petit-déj de lancement Chau7",
-        description: "Distribution gratuite de viennoiseries, café et chocolat chaud pour lancer le calendrier de l'Avent devant le Foyer !",
-        location: "Foyer N7",
-        points_hint: "+20 pts via QR code sur place",
-        is_revealed: true
-    },
-    {
-        day_number: 1,
-        slot: "midi",
-        event_date: "2026-12-01",
-        title: "Défi Chaussette Express",
-        description: "Viens affronter la pré-liste Chau7 au lancer de chaussettes dans la panier de Noël. Les vainqueurs repartent avec un bonus immédiat.",
-        location: "Hall B / Cour N7",
-        points_hint: "+30 pts victoire / +15 pts participation",
-        is_revealed: true
-    },
-    {
-        day_number: 1,
-        slot: "aprem",
-        event_date: "2026-12-01",
-        title: "Code secret en Story Insta",
-        description: "Un indice photo est caché dans l'école et publié sur notre compte Instagram. Trouve le lieu et valide le code secret avant 18h !",
-        location: "Insta @chau7.n7",
-        points_hint: "+25 pts (100 premiers)",
-        is_revealed: true
-    },
-    {
-        day_number: 1,
-        slot: "soir",
-        event_date: "2026-12-01",
-        title: "Soirée Open Crêpes & Vin Chaud",
-        description: "Grande soirée d'ouverture de décembre avec crêpes à volonté, ambiance de Noël et QR code bonus affiché à 21h.",
-        location: "Foyer N7",
-        points_hint: "+40 pts présence soirée",
-        is_revealed: true
-    }
-];
 
 // Calcule la date de l'événement (1er au 19 déc 2026) et sa date d'activation (7 jours avant)
 function getDaySchedule(dayNumber) {
@@ -254,7 +211,7 @@ if (codeForm) {
 
         try {
             // Appel de la fonction RPC PostgreSQL côté Supabase
-            const { data, error } = await supabaseCal.rpc("redeem_secret_code", {
+            const { data, error } = await supabaseCal.rpc("claim_event_code", {
                 input_code: codeValue
             });
 
@@ -285,27 +242,27 @@ async function loadSidebarWidgets() {
 
     const { data: topUsers } = await supabaseCal
         .from("profiles")
-        .select("identifiant, points")
+        .select("pseudo, points")
         .order("points", { ascending: false })
         .limit(3);
 
     if (topUsers) {
-        if (topUsers[0]) document.getElementById("sidebar-top1").textContent = `${topUsers[0].identifiant} (${topUsers[0].points})`;
-        if (topUsers[1]) document.getElementById("sidebar-top2").textContent = `${topUsers[1].identifiant} (${topUsers[1].points})`;
-        if (topUsers[2]) document.getElementById("sidebar-top3").textContent = `${topUsers[2].identifiant} (${topUsers[2].points})`;
+        if (topUsers[0]) document.getElementById("sidebar-top1").textContent = `${topUsers[0].pseudo} (${topUsers[0].points})`;
+        if (topUsers[1]) document.getElementById("sidebar-top2").textContent = `${topUsers[1].pseudo} (${topUsers[1].points})`;
+        if (topUsers[2]) document.getElementById("sidebar-top3").textContent = `${topUsers[2].pseudo} (${topUsers[2].points})`;
     }
 
     const logsList = document.getElementById("sidebar-logs-list");
     const { data: logs } = await supabaseCal
         .from("point_logs")
-        .select("reason, points_delta, profiles(identifiant)")
+        .select("reason, points_delta, profiles(pseudo)")
         .order("created_at", { ascending: false })
         .limit(5);
 
     if (logs && logs.length > 0 && logsList) {
         logsList.innerHTML = logs.map((log) => `
             <li class="log-item">
-                <span><strong>${log.profiles?.identifiant || "Joueur"}</strong> — ${log.reason}</span>
+                <span><strong>${log.profiles?.pseudo || "Joueur"}</strong> — ${log.reason}</span>
                 <span class="log-points">+${log.points_delta} pts 🧦</span>
             </li>
         `).join("");

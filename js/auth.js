@@ -23,7 +23,7 @@ async function refreshUserNavbar() {
     // Lecture du profil dans la table 'profiles' (SELECT public selon Archit_2.md)
     const { data: profile } = await db
         .from("profiles")
-        .select("identifiant, filiere, points, prenom")
+        .select("pseudo, filiere, points, prenom")
         .eq("id", session.user.id)
         .single();
 
@@ -31,7 +31,7 @@ async function refreshUserNavbar() {
     if (navUser) {
         navUser.style.display = "flex";
         const meta = session.user.user_metadata || {};
-        document.getElementById("user-identifiant").textContent = profile?.identifiant || meta.identifiant || "Joueur";
+        document.getElementById("user-pseudo").textContent = profile?.pseudo || meta.pseudo || "Joueur";
         document.getElementById("user-filiere").textContent = profile?.filiere || meta.filiere || "-";
         document.getElementById("user-points").textContent = profile?.points ?? 0;
     }
@@ -50,21 +50,21 @@ if (registerForm) {
 
         const prenom = document.getElementById("prenom").value.trim();
         const nom = document.getElementById("nom").value.trim();
-        const identifiant = document.getElementById("identifiant").value.trim();
+        const pseudo = document.getElementById("pseudo").value.trim();
         const filiere = document.getElementById("filiere").value;
         const email = document.getElementById("email").value.trim().toLowerCase();
         const password = document.getElementById("password").value;
 
         try {
-            // Vérification préalable de l'unicité de l'identifiant public
+            // Vérification préalable de l'unicité du pseudo
             const { data: existingPseudo } = await db
                 .from("profiles")
                 .select("id")
-                .ilike("identifiant", identifiant)
+                .ilike("pseudo", pseudo)
                 .maybeSingle();
 
             if (existingPseudo) {
-                showAuthAlert("auth-message", "Cet identifiant public est déjà pris par un autre joueur.", "error");
+                showAuthAlert("auth-message", "Ce pseudo est déjà pris par un autre joueur.", "error");
                 return;
             }
 
@@ -76,7 +76,7 @@ if (registerForm) {
                     data: {
                         prenom,
                         nom,
-                        identifiant,
+                        pseudo,
                         filiere,
                         email
                     }

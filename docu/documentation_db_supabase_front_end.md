@@ -9,6 +9,7 @@ Ce document détaille la structure exacte de la base de données **Supabase (Pos
 ## 1. Structure des Tables
 
 ### A. `profiles` (Comptes joueurs & Streak)
+
 Créée automatiquement par un trigger SQL lors de l'inscription d'un utilisateur.
 
 | Colonne | Type | Contraintes | Description & Usage Front-end |
@@ -25,6 +26,7 @@ Créée automatiquement par un trigger SQL lors de l'inscription d'un utilisateu
 | `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | Date d'inscription |
 
 ### B. `advent_events` (Planning du 1er au 19 décembre 2026)
+
 Contient jusqu'à **4 créneaux par jour**. Les images associées sont hébergées dans le dépôt Git (ex: `/events/01-matin.jpg`) pour préserver la bande passante.
 
 | Colonne | Type | Contraintes | Description & Usage Front-end |
@@ -42,6 +44,7 @@ Contient jusqu'à **4 créneaux par jour**. Les images associées sont hébergé
 | `is_revealed` | `BOOLEAN` | `DEFAULT FALSE` | `true` = contenu visible ; `false` = case verrouillée (`🔒`) |
 
 ### C. `point_logs` (Historique transparent des gains)
+
 Trace chaque point gagné (code event, check-in quotidien ou récompense manuelle) et empêche les doublons.
 
 | Colonne | Type | Contraintes | Description & Usage Front-end |
@@ -59,6 +62,7 @@ Trace chaque point gagné (code event, check-in quotidien ou récompense manuell
 ## 2. Intégration SDK Front-end (`@supabase/supabase-js`)
 
 ### 1. Inscription (`signUp`)
+
 Il est impératif de passer `prenom`, `nom`, `filiere` et `pseudo` dans `options.data` pour que le trigger SQL crée correctement la ligne dans `profiles`.
 
 ```javascript
@@ -77,6 +81,7 @@ const { data, error } = await supabase.auth.signUp({
 ```
 
 ### 2. Lecture des données (Calendrier, Classement, Historique)
+
 Toutes ces requêtes sont autorisées en lecture publique (`SELECT`) :
 
 ```javascript
@@ -101,7 +106,9 @@ const { data: logs } = await supabase
 ```
 
 ### 3. Valider le code secret d'un événement (`claim_event_code`)
+
 Utilisé pour le champ de saisie manuelle **et** pour la détection automatique d'un QR code dans l'URL (`?code=XXXX`).
+
 * Le code n'est valide **que le jour même de l'événement** (expire automatiquement à `23h59` heure de Paris).
 * Renvoie toujours un objet JSON `{ success: boolean, message: string, points?: number }`.
 
@@ -119,6 +126,7 @@ if (data.success) {
 ```
 
 ### 4. Bouton Check-in quotidien / Streak (`daily_checkin`)
+
 * Ouvert du **1er au 19 décembre 2026**.
 * Barème progressif automatique sur 19 jours consécutifs = **100 points au total** :
   * Jours 1 à 5 : `+2 pts/j`

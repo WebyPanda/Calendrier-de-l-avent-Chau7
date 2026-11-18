@@ -1,3 +1,4 @@
+// Événements de démonstration pour le Jour 1 si la table 'advent_events' est encore vide
 const supabaseCal = window.supabaseClient;
 
 // ⚠️ Permet d'activer uniquement le Jour 1 dès aujourd'hui pour visualiser le rendu débloqué.
@@ -117,12 +118,6 @@ async function loadAdventCalendar() {
             eventsByDay[ev.day_number].push(ev);
         });
     }
-
-    // Si la table Supabase n'a pas encore d'événements pour le Jour 1, on injecte l'aperçu
-    if (!eventsByDay[1] || eventsByDay[1].length === 0) {
-        eventsByDay[1] = FALLBACK_DAY1_EVENTS;
-    }
-
     const now = new Date();
     const patterns = ["snowflake", "dots", "stripes"];
     grid.innerHTML = "";

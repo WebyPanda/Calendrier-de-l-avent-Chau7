@@ -1027,3 +1027,124 @@ footer {
     border-radius: 999px;
     font-size: 0.9rem;
 }
+
+/* --- Pastille profil cliquable & Modale Mon Profil --- */
+.user-pill {
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.user-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(217, 138, 28, 0.32);
+}
+
+.profile-hero-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1.5px solid var(--gold-bright);
+    border-radius: 14px;
+    padding: 0.95rem 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.profile-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--pine);
+    color: white;
+    font-size: 1.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(16, 60, 38, 0.25);
+}
+
+.profile-pseudo-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+}
+
+.profile-pseudo-row h3 {
+    color: var(--pine-dark);
+    font-size: 1.2rem;
+}
+
+.profile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+}
+
+.profile-stat-card {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.stat-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.05rem;
+    font-weight: 900;
+}
+
+.profile-info-box {
+    background: #fffdf9;
+    border: 1px solid #e7decb;
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.profile-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px dashed #e2e8f0;
+    padding-bottom: 0.4rem;
+}
+
+.profile-info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.profile-history-section h4 {
+    color: var(--pine-dark);
+    font-size: 0.96rem;
+    margin-bottom: 0.4rem;
+}
+
+@media (max-width: 520px) {
+    .profile-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .profile-info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.15rem;
+    }
+}

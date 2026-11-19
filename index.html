@@ -170,6 +170,97 @@
         body.open-curtains .loader-card {
             opacity: 0;
             transform: scale(0.94) translateY(-10px);
+            pointer-events: none;
+        }
+
+        /* --- Style du Portail intégré --- */
+        .portal-container {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(1.08);
+            transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+            pointer-events: none;
+            z-index: 5;
+            padding: 1.5rem;
+        }
+
+        body.open-curtains .portal-container {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .portal-wrapper {
+            background: rgba(11, 43, 27, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid var(--gold-bright);
+            padding: 2.2rem 2rem;
+            border-radius: 28px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .portal-wrapper h2 {
+            color: #ffffff;
+            font-size: 1.7rem;
+            margin-bottom: 0.5rem;
+            font-weight: 900;
+        }
+
+        .portal-wrapper h2 span {
+            color: var(--gold-bright);
+        }
+
+        .portal-wrapper .portal-subtitle {
+            font-size: 0.9rem;
+            color: rgba(251, 246, 235, 0.8);
+            margin-bottom: 1.8rem;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.1rem;
+        }
+
+        .portal-btn {
+            padding: 1.1rem 0.8rem;
+            border-radius: 18px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid rgba(245, 176, 65, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.88rem;
+            transition: all 0.25s ease;
+        }
+
+        .portal-btn span {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            transition: transform 0.25s ease;
+        }
+
+        .portal-btn:hover {
+            background: var(--gold-bright);
+            color: var(--pine-dark);
+            border-color: var(--gold-light);
+            box-shadow: 0 8px 20px rgba(245, 176, 65, 0.35);
+            transform: translateY(-3px);
+        }
+
+        .portal-btn:hover span {
+            transform: scale(1.15) rotate(5deg);
         }
 
         .school-tag {
@@ -315,7 +406,7 @@
 
     <!-- Carte principale de chargement -->
     <main class="loader-card" id="loader-card">
-        <div class="school-tag">Toulouse INP — ENSEEIHT</div>
+        <div class="school-tag">Édition Spéciale</div>
         <h1>Calendrier <span>Chau7</span></h1>
 
         <!-- Grande chaussette tricotée qui se remplit avec la progression -->
@@ -371,9 +462,29 @@
         </div>
     </main>
 
-    <a href="html/portail.html" class="skip-btn">Passer l'intro →</a>
+    <!-- Portail intégré -->
+    <section class="portal-container" id="portal-container">
+        <div class="portal-wrapper">
+            <h2>Bienvenue aux <span>Chau7</span></h2>
+            <p class="portal-subtitle">Ton calendrier de l'avent Chau7</p>
+            <div class="portal-grid">
+                <a href="html/accueil.html" class="portal-btn"><span>🏠</span>Accueil</a>
+                <a href="html/classement.html" class="portal-btn"><span>🏆</span>Classement</a>
+                <a href="html/login.html" class="portal-btn"><span>🔑</span>Connexion</a>
+                <a href="html/register.html" class="portal-btn"><span>📝</span>S'inscrire</a>
+            </div>
+        </div>
+    </section>
+
+    <a href="#" class="skip-btn" onclick="skipIntro()">Passer l'intro →</a>
 
     <script>
+        function skipIntro() {
+            document.body.classList.add("open-curtains");
+            clearInterval(timer);
+            // On peut ajouter une logique pour forcer la fin du chargement si besoin
+        }
+
         // 1. Génération des flocons légers
         const snowLayer = document.getElementById("snow-layer");
         const flakes = ["❄", "❅", "❆", "•"];
@@ -467,9 +578,6 @@
 
                 setTimeout(() => {
                     document.body.classList.add("open-curtains");
-                    setTimeout(() => {
-                        window.location.href = "html/portail.html";
-                    }, 1050);
                 }, 450);
             }
         }, 100); // ~2,8s de remplissage + 1,5s d'ouverture des rideaux

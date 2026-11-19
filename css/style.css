@@ -69,7 +69,7 @@ body {
 
 /* --- Barre de navigation crème + pilule rouge Chau7 --- */
 nav {
-    background: var(--cream);
+    background: linear-gradient(rgba(251, 246, 235, 0.40), rgba(251, 246, 235, 0.40)), url("../img/site/upper_bar.jpg") center/cover no-repeat;
     padding: 0.75rem 1.5rem;
     display: flex;
     flex-wrap: wrap;
@@ -85,11 +85,16 @@ nav {
 .brand {
     color: var(--pine-dark);
     text-decoration: none;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 800;
     display: flex;
     align-items: center;
     gap: 0.45rem;
+    background: rgba(251, 246, 235, 0.82);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(217, 138, 28, 0.35);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .nav-pill-menu {
@@ -138,6 +143,7 @@ nav {
     border-radius: 999px;
     border: 1.5px solid var(--pine);
     color: var(--pine);
+    background: rgba(251, 246, 235, 0.82);
     transition: all 0.2s;
 }
 

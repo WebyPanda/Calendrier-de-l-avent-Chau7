@@ -1,8 +1,8 @@
-﻿# 🎄 Chau7 Advent Calendar - Toulouse INP-N7 🎁
+﻿# Chau7 Advent Calendar
 
-Welcome to the **Advent Calendar** web app, created specially for the **Chau7** student pre-list at ENSEEIHT! 🎅✨
+Welcome to the **Advent Calendar** web app, created specially for the **Chau7** student pre-list at ENSEEIHT! 
 
-This project was built to bring festive cheer and excitement to our campus life before the winter holidays. Every day, students can unlock a new event or challenge, earn points using secret codes, and rise to the top of our real-time leaderboard! 🏆
+This project was built to bring festive cheer and excitement to our campus life before the winter holidays. Every day, students can unlock a new event or challenge, earn points using secret codes, and rise to the top of our real-time leaderboard! 
 
 ---
 

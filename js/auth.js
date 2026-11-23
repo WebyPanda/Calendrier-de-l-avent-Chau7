@@ -199,22 +199,12 @@ async function refreshUserNavbar() {
     if (navGuest) navGuest.style.display = "none";
     if (navUser) {
         navUser.style.display = "flex";
-        navUser.title = "Cliquer pour voir mon profil";
         const meta = session.user.user_metadata || {};
 
         const pseudoEl = document.getElementById("user-pseudo") || document.getElementById("user-identifiant");
         if (pseudoEl) pseudoEl.textContent = profile?.pseudo || meta.pseudo || "Joueur";
         document.getElementById("user-filiere").textContent = profile?.filiere || meta.filiere || "-";
         document.getElementById("user-points").textContent = profile?.points ?? 0;
-
-        // Attache l'ouverture du profil au clic sur la pastille (une seule fois)
-        if (!navUser.dataset.profileBound) {
-            navUser.dataset.profileBound = "true";
-            navUser.addEventListener("click", (e) => {
-                if (e.target.closest("#btn-logout")) return;
-                openUserProfileModal();
-            });
-        }
     }
 
     return { session, profile };
@@ -267,8 +257,8 @@ if (registerForm) {
             }
 
             if (data.session) {
-                showAuthAlert("auth-message", "Compte créé avec succès ! Redirection vers le calendrier...", "success");
-                setTimeout(() => window.location.href = "accueil.html", 1000);
+                showAuthAlert("auth-message", "Compte créé avec succès ! Redirection vers ton profil...", "success");
+                setTimeout(() => window.location.href = "profile.html", 1000);
             } else {
                 showAuthAlert(
                     "auth-message",
@@ -312,8 +302,8 @@ if (loginForm) {
                 return;
             }
 
-            showAuthAlert("auth-message", "Connexion réussie ! Redirection...", "success");
-            setTimeout(() => window.location.href = "accueil.html", 700);
+            showAuthAlert("auth-message", "Connexion réussie ! Redirection vers ton profil...", "success");
+            setTimeout(() => window.location.href = "profile.html", 700);
         } catch (err) {
             showAuthAlert("auth-message", "Impossible de joindre le serveur d'authentification.", "error");
         } finally {

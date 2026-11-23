@@ -171,6 +171,16 @@ nav {
     box-shadow: 0 3px 10px rgba(217, 138, 28, 0.18);
 }
 
+.user-profile-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.user-profile-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 .btn-logout {
     background: var(--red);
     color: white;

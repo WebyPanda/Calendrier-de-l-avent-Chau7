@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon profil — Calendrier Chau7</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            background:
+                radial-gradient(ellipse at 50% 0, rgba(34, 107, 71, 0.13), transparent 55%),
+                var(--page-bg);
+        }
+
+        .profile-page {
+            width: min(100% - 2rem, 920px);
+            margin: 2rem auto 3rem;
+        }
+
+        .profile-heading {
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+
+        .profile-heading .eyebrow {
+            color: var(--red);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .profile-heading h1 {
+            margin-top: 0.25rem;
+            color: var(--pine-dark);
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+        }
+
+        .profile-card {
+            overflow: hidden;
+            border: 1px solid rgba(217, 138, 28, 0.24);
+            border-radius: 24px;
+            background: var(--card-bg);
+            box-shadow: 0 18px 45px rgba(16, 60, 38, 0.12);
+        }
+
+        .profile-banner {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: clamp(1.4rem, 5vw, 2.2rem);
+            color: var(--cream);
+            background:
+                radial-gradient(circle at 90% 15%, rgba(245, 176, 65, 0.28), transparent 32%),
+                linear-gradient(125deg, #082014, #175235 72%, #226b47);
+        }
+
+        .profile-banner::after {
+            position: absolute;
+            right: 1.3rem;
+            bottom: 0.45rem;
+            color: rgba(253, 230, 138, 0.3);
+            content: "✦  ✧  ✦";
+            font-size: 1.4rem;
+            letter-spacing: 0.35rem;
+        }
+
+        .profile-avatar {
+            display: grid;
+            flex: 0 0 76px;
+            width: 76px;
+            height: 76px;
+            place-items: center;
+            border: 2px solid rgba(253, 230, 138, 0.8);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+            font-size: 2.6rem;
+        }
+
+        .profile-identity {
+            min-width: 0;
+        }
+
+        .profile-identity h2 {
+            overflow-wrap: anywhere;
+            color: #fff;
+            font-size: clamp(1.45rem, 5vw, 2rem);
+        }
+
+        .profile-identity p {
+            margin-top: 0.25rem;
+            color: rgba(251, 246, 235, 0.82);
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            margin-top: 0.6rem;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid rgba(253, 230, 138, 0.45);
+            border-radius: 999px;
+            background: rgba(253, 230, 138, 0.14);
+            color: #fde68a;
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .profile-content {
+            padding: clamp(1rem, 4vw, 1.8rem);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .profile-stat {
+            padding: 1rem;
+            border: 1px solid #eee6d8;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #fffdf8, #fbf6eb);
+            text-align: center;
+        }
+
+        .profile-stat span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        .profile-stat strong {
+            display: block;
+            margin-top: 0.25rem;
+            color: var(--pine-dark);
+            font-size: 1.65rem;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-detail {
+            min-width: 0;
+            padding: 0.85rem 1rem;
+            border-left: 3px solid var(--gold);
+            border-radius: 0 12px 12px 0;
+            background: #f8faf8;
+        }
+
+        .profile-detail span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .profile-detail strong {
+            display: block;
+            overflow-wrap: anywhere;
+            margin-top: 0.2rem;
+            color: var(--text-main);
+        }
+
+        .checkin-panel {
+            padding: 1.2rem;
+            border: 1px solid rgba(217, 138, 28, 0.3);
+            border-radius: 18px;
+            background: linear-gradient(120deg, #fffaf0, #fffdf8);
+            text-align: center;
+        }
+
+        .checkin-panel h3 {
+            color: var(--pine-dark);
+        }
+
+        .checkin-panel p {
+            margin: 0.35rem 0 1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .btn-checkin {
+            width: 100%;
+            max-width: 360px;
+            padding: 0.9rem 1.2rem;
+            border: 0;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--red), var(--red-bright));
+            box-shadow: 0 6px 16px rgba(166, 28, 28, 0.2);
+            color: white;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 800;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+        }
+
+        .btn-checkin:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 20px rgba(166, 28, 28, 0.28);
+        }
+
+        .btn-checkin:disabled {
+            background: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .profile-message {
+            display: none;
+            margin: 0 0 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .profile-message.visible { display: block; }
+        .profile-message.error { background: #fef2f2; color: #991b1b; }
+        .profile-message.success { background: #ecfdf5; color: #166534; }
+
+        @media (max-width: 560px) {
+            .profile-page { width: min(100% - 1rem, 920px); margin-top: 1rem; }
+            .profile-banner { align-items: flex-start; gap: 0.9rem; }
+            .profile-avatar { flex-basis: 60px; width: 60px; height: 60px; font-size: 2rem; }
+            .profile-stats, .profile-details { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="snow-container" aria-hidden="true">
+        <span class="snowflake" style="left:12%; animation-duration:12s; font-size:1.1rem;">❄</span>
+        <span class="snowflake" style="left:48%; animation-duration:15s; animation-delay:2s; font-size:0.95rem;">❅</span>
+        <span class="snowflake" style="left:86%; animation-duration:13s; animation-delay:4s; font-size:1.15rem;">❄</span>
+    </div>
+
+    <nav>
+        <a href="accueil.html" class="brand">🎄 Calendrier Chau7 🧦</a>
+        <div class="nav-pill-menu">
+            <a href="accueil.html">Calendrier</a>
+            <a href="classement.html">Classement</a>
+            <a href="regles.html">Règles</a>
+        </div>
+        <div class="nav-right">
+            <div id="nav-user" class="user-pill">
+                <span>🎅 <strong id="user-pseudo">Joueur</strong> (<span id="user-filiere">-</span>)</span>
+                <span>🏆 <strong id="user-points">0</strong> pts 🧦</span>
+                <button type="button" id="btn-logout" class="btn-logout">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="profile-page">
+        <header class="profile-heading">
+            <p class="eyebrow">🎄 Ton espace Chau7 🎄</p>
+            <h1>Mon profil</h1>
+        </header>
+
+        <section class="profile-card" aria-label="Informations du profil">
+            <div class="profile-banner">
+                <div class="profile-avatar" aria-hidden="true">🧦</div>
+                <div class="profile-identity">
+                    <h2 id="profile-pseudo">Chargement du profil...</h2>
+                    <p id="profile-name">Tes informations arrivent...</p>
+                    <span class="profile-badge" id="profile-filiere">Filière</span>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div id="profile-message" class="profile-message" role="status" aria-live="polite"></div>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <span>🎁 Points récoltés</span>
+                        <strong><span id="profile-points">0</span> pts</strong>
+                    </div>
+                    <div class="profile-stat">
+                        <span>🔥 Série de check-in</span>
+                        <strong><span id="profile-streak">0</span> jours</strong>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="profile-detail"><span>Adresse e-mail</span><strong id="profile-email">—</strong></div>
+                    <div class="profile-detail"><span>Inscription</span><strong id="profile-created">—</strong></div>
+                    <div class="profile-detail"><span>Dernier check-in</span><strong id="profile-last-checkin">Aucun</strong></div>
+                    <div class="profile-detail"><span>Prochain objectif</span><strong>Garder ta série active ✨</strong></div>
+                </div>
+
+                <div class="checkin-panel">
+                    <h3>Le rendez-vous du jour</h3>
+                    <p>Valide ton passage quotidien pour gagner des points et faire grandir ta série.</p>
+                    <button id="btn-checkin" class="btn-checkin" type="button" disabled>Chargement...</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        (() => {
+            const client = window.supabaseClient;
+            const checkinButton = document.getElementById("btn-checkin");
+            const message = document.getElementById("profile-message");
+            let currentProfile = null;
+
+            function showMessage(text, type) {
+                message.textContent = text;
+                message.className = `profile-message visible ${type}`;
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return "—";
+                const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(dateString) ? `${dateString}T00:00:00` : dateString);
+                return Number.isNaN(date.getTime())
+                    ? "—"
+                    : date.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+            }
+
+            async function loadProfile() {
+                checkinButton.disabled = true;
+                checkinButton.textContent = "Chargement...";
+                message.className = "profile-message";
+
+                try {
+                    const { data: { session }, error: sessionError } = await client.auth.getSession();
+                    if (sessionError) throw sessionError;
+                    if (!session) {
+                        window.location.replace("login.html");
+                        return;
+                    }
+
+                    const { data: profile, error } = await client
+                        .from("profiles")
+                        .select("prenom, nom, pseudo, filiere, email, points, current_streak, last_checkin_date, created_at")
+                        .eq("id", session.user.id)
+                        .single();
+
+                    if (error) throw error;
+                    if (!profile) throw new Error("Aucun profil n'a été trouvé pour ce compte.");
+
+                    currentProfile = profile;
+                    const metadata = session.user.user_metadata || {};
+                    document.getElementById("profile-pseudo").textContent = profile.pseudo || metadata.pseudo || "Joueur";
+                    document.getElementById("profile-name").textContent =
+                        [profile.prenom || metadata.prenom, profile.nom || metadata.nom].filter(Boolean).join(" ") || "Joueur Chau7";
+                    document.getElementById("profile-filiere").textContent = profile.filiere || metadata.filiere || "Filière non renseignée";
+                    document.getElementById("profile-points").textContent = profile.points ?? 0;
+                    document.getElementById("profile-streak").textContent = profile.current_streak ?? 0;
+                    document.getElementById("profile-email").textContent = profile.email || session.user.email || "—";
+                    document.getElementById("profile-created").textContent = formatDate(profile.created_at);
+                    document.getElementById("profile-last-checkin").textContent =
+                        profile.last_checkin_date ? formatDate(profile.last_checkin_date) : "Aucun";
+
+                    const today = new Date();
+                    const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+                    const checkedInToday = profile.last_checkin_date === todayString;
+                    checkinButton.disabled = checkedInToday;
+                    checkinButton.textContent = checkedInToday
+                        ? "Check-in déjà validé aujourd'hui ✅"
+                        : "Faire mon check-in du jour 🎁";
+                } catch (error) {
+                    console.error("Impossible de charger le profil :", error);
+                    document.getElementById("profile-pseudo").textContent = "Profil indisponible";
+                    document.getElementById("profile-name").textContent = "Les informations du compte n'ont pas pu être chargées.";
+                    checkinButton.textContent = "Check-in indisponible";
+                    showMessage(`Erreur de chargement : ${error.message || "vérifie ta connexion puis réessaie."}`, "error");
+                }
+            }
+
+            checkinButton.addEventListener("click", async () => {
+                if (!currentProfile) return;
+                checkinButton.disabled = true;
+                checkinButton.textContent = "Validation en cours...";
+                message.className = "profile-message";
+
+                try {
+                    // La fonction SQL identifie le joueur avec auth.uid(); aucun user_id ne doit être transmis par le navigateur.
+                    const { data, error } = await client.rpc("daily_checkin");
+                    if (error) throw error;
+
+                    await loadProfile();
+                    if (data && data.success === false) {
+                        showMessage(data.message || "Le check-in n'a pas pu être validé.", "error");
+                    } else {
+                        showMessage(data?.message || "Check-in validé, bravo ! 🎄", "success");
+                    }
+                } catch (error) {
+                    console.error("Erreur pendant le check-in :", error);
+                    showMessage(`Check-in impossible : ${error.message || "réessaie dans un instant."}`, "error");
+                    checkinButton.disabled = false;
+                    checkinButton.textContent = "Réessayer le check-in 🎁";
+                }
+            });
+
+            loadProfile();
+        })();
+    </script>
+</body>
+</html>

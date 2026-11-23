@@ -21,13 +21,4 @@ As part of our campaign for the student union association at ENSEEIHT, **Chau7**
 - **Deployment:** Vercel / GitHub Pages.
 
 ---
-
-## 💼 E-Portfolio Highlight
-This project is a great showcase of practical full-stack skills:
-1. **Agile Full-Stack:** Building and launching a complete application by connecting a lightweight frontend with a powerful backend.
-2. **Secure Database Logic:** Implementing secure transaction functions (RPCs) directly in the database.
-3. **Mobile-First Experience:** Designing an interface engineered for quick use on students' smartphones.
-4. **Interactive UI/UX:** Combining CSS animations and an engaging holiday theme to drive student participation.
-
----
 *Built with passion and holiday spirit for Chau7! 🎄*

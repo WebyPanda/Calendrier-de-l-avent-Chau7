@@ -1,5 +1,9 @@
 const supabaseCal = window.supabaseClient;
 
+// ⚠️ Permet d'activer uniquement le Jour 1 dès aujourd'hui pour visualiser le rendu débloqué.
+// Passe cette variable à `null` une fois les tests terminés pour n'utiliser que la règle J-7.
+const PREVIEW_ACTIVE_DAY = 1;
+
 const SLOT_ORDER = { matin: 1, midi: 2, aprem: 3, soir: 4 };
 const SLOT_LABELS = {
     matin: "🌅 Matin (09h45 - 10h15)",
@@ -12,7 +16,14 @@ function getSlotPosterCandidates(dayNumber, slot) {
     if (!Object.prototype.hasOwnProperty.call(SLOT_ORDER, slot)) return [];
 
     const dayNames = [...new Set([String(dayNumber), String(dayNumber).padStart(2, "0")])];
-    return dayNames.map((dayName) => `../img/events/${dayName}-${slot}.jpg`);
+    const extensions = ["jpg", "png", "jpeg", "webp"];
+    const urls = [];
+    for (const d of dayNames) {
+        for (const ext of extensions) {
+            urls.push(`../img/events/${d}-${slot}.${ext}`);
+        }
+    }
+    return urls;
 }
 
 // Calcule la date de l'événement (1er au 19 déc 2026) et sa date d'activation (7 jours avant)
@@ -138,7 +149,7 @@ async function loadAdventCalendar() {
 
     const { data: eventsData, error } = await supabaseCal
         .from("advent_events")
-        .select("day_number, slot, event_date, title, description, location, points_hint");
+        .select("day_number, slot, event_date, title, description, location, points_hint, is_revealed");
 
     const eventsByDay = {};
     if (!error && eventsData) {
@@ -155,7 +166,7 @@ async function loadAdventCalendar() {
         const { eventDate, unlockDate } = getDaySchedule(day);
         const dayEvents = eventsByDay[day] || [];
 
-        const isUnlocked = now >= unlockDate;
+        const isUnlocked = dayEvents.some((ev) => ev.is_revealed) || day === PREVIEW_ACTIVE_DAY;
         const isToday = now.toDateString() === eventDate.toDateString();
 
         const card = document.createElement("article");

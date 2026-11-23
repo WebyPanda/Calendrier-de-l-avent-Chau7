@@ -1,4 +1,4 @@
-﻿# Calendrier de l'Avent Chau7 - Toulouse INP-N7
+﻿# Calendrier de l'Avent Chau7
 
 Bienvenue sur le projet du **Calendrier de l'Avent** conçu spécialement pour la pré-liste étudiante **Chau7** de l'ENSEEIHT ! 
 

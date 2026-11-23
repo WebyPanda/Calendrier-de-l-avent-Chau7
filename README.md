@@ -21,13 +21,4 @@ Dans le cadre de notre campagne pour l'association étudiante de l'ENSEEIHT, la 
 - **Déploiement :** Vercel / GitHub Pages.
 
 ---
-
-## 💼 Valorisation (e-Portfolio)
-Ce projet est une superbe démonstration de compétences concrètes et utiles pour mon parcours :
-1. **Full-Stack agile :** Intégration rapide et efficace d'un frontend avec un service de Backend-as-a-Service (Supabase).
-2. **Logique métier sécurisée :** Mise en œuvre de transactions sécurisées directement dans la base de données PostgreSQL (fonctions RPC).
-3. **Approche Mobile-First :** Interface entièrement pensée et optimisée pour un usage sur smartphone par les étudiants.
-4. **UI/UX engageante :** Utilisation d'animations fluides et d'un design thématique pour maximiser l'interaction.
-
----
 *Fait avec passion et esprit de fête pour Chau7 ! 🎄*

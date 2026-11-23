@@ -13,14 +13,14 @@ const SLOT_LABELS = {
 };
 
 function getSlotPosterCandidates(dayNumber, slot) {
-    if (!Object.prototype.hasOwnProperty.call(SLOT_ORDER, slot)) return [];
-
+    const cleanSlot = String(slot || "").trim().toLowerCase();
     const dayNames = [...new Set([String(dayNumber), String(dayNumber).padStart(2, "0")])];
     const extensions = ["jpg", "png", "jpeg", "webp"];
     const urls = [];
+
     for (const d of dayNames) {
         for (const ext of extensions) {
-            urls.push(`../img/events/${d}-${slot}.${ext}`);
+            urls.push(`../img/events/${d}-${cleanSlot}.${ext}`);
         }
     }
     return urls;
@@ -76,7 +76,7 @@ function openDayModal(dayNumber, dayEvents, isUnlocked, unlockDate) {
 
     container.innerHTML = `
         <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:0.85rem;">
-            👆 Clique sur un événement ci-dessous pour afficher tous ses détails (lieu, description, gain de points).
+            👆 Clique sur un événement ci-dessous pour afficher tous ses détails (lieu, description, affiche, gain de points).
         </p>
         ${sorted.map((ev, index) => `
             <article class="slot-item clickable-event" data-slot-index="${index}">
@@ -90,8 +90,8 @@ function openDayModal(dayNumber, dayEvents, isUnlocked, unlockDate) {
                 </div>
                 <div class="slot-details-drawer">
                     <p class="slot-desc">${ev.description || "Plus d'informations très bientôt sur @chau7.n7 !"}</p>
-                    <div class="slot-poster-frame" hidden>
-                        <img class="slot-poster" loading="lazy">
+                    <div class="slot-poster-frame" style="display:none; margin:0.85rem auto; width:100%; max-width:260px; aspect-ratio:9/16; border-radius:14px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.18);">
+                        <img class="slot-poster" style="width:100%; height:100%; object-fit:cover; display:block;">
                     </div>
                     <div class="slot-meta-grid">
                         <span>📍 <strong>Lieu :</strong> ${ev.location || "Campus ENSEEIHT"}</span>
@@ -105,9 +105,8 @@ function openDayModal(dayNumber, dayEvents, isUnlocked, unlockDate) {
         `).join("")}
     `;
 
-    // Rend chaque événement cliquable pour déplier/replier ses détails complets
     container.querySelectorAll(".clickable-event").forEach((card, index) => {
-        card.addEventListener("click", () => {
+        card.addEventListener("click", async () => {
             const wasOpen = card.classList.contains("expanded");
             container.querySelectorAll(".clickable-event").forEach((c) => c.classList.remove("expanded"));
             if (wasOpen) return;
@@ -117,25 +116,23 @@ function openDayModal(dayNumber, dayEvents, isUnlocked, unlockDate) {
             card.dataset.posterChecked = "true";
 
             const posterFrame = card.querySelector(".slot-poster-frame");
-            if (!posterFrame) return;
-            const poster = posterFrame.querySelector(".slot-poster");
-            const candidates = getSlotPosterCandidates(dayNumber, sorted[index].slot);
-            let candidateIndex = 0;
+            const poster = card.querySelector(".slot-poster");
+            if (!posterFrame || !poster) return;
 
-            poster.alt = `Visuel de l'événement ${sorted[index].title || "Chau7"}`;
-            poster.onload = () => { posterFrame.hidden = false; };
-            poster.onerror = () => {
-                if (candidateIndex < candidates.length) {
-                    poster.src = candidates[candidateIndex++];
-                } else {
-                    posterFrame.remove();
-                }
-            };
-            if (candidates.length > 0) {
-                poster.src = candidates[candidateIndex++];
-            } else {
-                posterFrame.remove();
+            const candidates = getSlotPosterCandidates(dayNumber, sorted[index].slot);
+            for (const url of candidates) {
+                try {
+                    const res = await fetch(url, { method: "HEAD" });
+                    if (res.ok) {
+                        poster.alt = `Visuel de l'événement ${sorted[index].title || "Chau7"}`;
+                        poster.src = url;
+                        posterFrame.style.display = "block";
+                        return;
+                    }
+                } catch (e) {}
             }
+
+            posterFrame.remove();
         });
     });
 

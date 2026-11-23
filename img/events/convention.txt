@@ -1,3 +1,4 @@
-On gardera et pour toi et pour moi les stories qu'on republiera sur le site 
-au format jour-créneau.jpg (01-matin.jpg), elles seront en 9x16 surement.
-On les passera aussi un coup sur https://squoosh.app/ pour les compresser.
+Les visuels des événements sont à placer ici, au format portrait 9:16.
+Nom attendu : jour-créneau.jpg (ex. 1-matin.jpg ou 01-matin.jpg).
+Créneaux : matin, midi, aprem, soir. Les visuels sont chargés à l'ouverture des détails.
+On peut les compresser avec https://squoosh.app/ avant de les ajouter.

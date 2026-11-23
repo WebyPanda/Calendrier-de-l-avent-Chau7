@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendrier de l'Avent Chau7 - ENSEEIHT</title>
+    <link rel="icon" type="image/png" href="../img/site/logo.png">
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -140,7 +141,7 @@
     </div>
 
     <footer>
-        Pré-liste Chau7 — Toulouse INP-ENSEEIHT 🎄🧦
+        Calendrier de l'Avent Chau7 🎄🧦
     </footer>
 
     <script>
@@ -237,21 +238,33 @@
             updateMiniSocks();
         }
 
-        // 3. Compte à rebours dynamique vers le 1er décembre 2026
+        // 3. Compte à rebours vers la prochaine révélation (7 jours avant chaque événement)
         function updateCountdown() {
-            const target = new Date("2026-12-01T08:00:00+01:00").getTime();
             const now = Date.now();
-            const diff = target - now;
             const pill = document.getElementById("countdown-pill");
-            if (diff <= 0) {
-                pill.textContent = "🎄 L'Avent Chau7 est ouvert !";
+            let nextDay = null;
+            let target = null;
+
+            for (let day = 1; day <= 19; day++) {
+                const unlockDate = new Date(2026, 11, day - 7, 0, 0, 0);
+                if (unlockDate.getTime() > now) {
+                    nextDay = day;
+                    target = unlockDate.getTime();
+                    break;
+                }
+            }
+
+            if (target === null) {
+                pill.textContent = "🎄 Toutes les chaussettes ont été révélées !";
                 return;
             }
+
+            const diff = target - now;
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
             const m = Math.floor((diff / (1000 * 60)) % 60);
             const s = Math.floor((diff / 1000) % 60);
-            pill.textContent = `⏳ Ouverture case 1 dans : ${d}j ${h}h ${m}m ${s}s`;
+            pill.textContent = `⏳ Révélation de la case ${nextDay} dans : ${d}j ${h}h ${m}m ${s}s`;
         }
         updateCountdown();
         setInterval(updateCountdown, 1000);

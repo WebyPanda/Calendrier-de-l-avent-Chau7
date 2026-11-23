@@ -1,9 +1,4 @@
-// Événements de démonstration pour le Jour 1 si la table 'advent_events' est encore vide
 const supabaseCal = window.supabaseClient;
-
-// ⚠️ Permet d'activer uniquement le Jour 1 dès aujourd'hui pour visualiser le rendu débloqué.
-// Passe cette variable à `null` une fois les tests terminés pour n'utiliser que la règle J-7.
-const PREVIEW_ACTIVE_DAY = 1;
 
 const SLOT_ORDER = { matin: 1, midi: 2, aprem: 3, soir: 4 };
 const SLOT_LABELS = {
@@ -13,6 +8,12 @@ const SLOT_LABELS = {
     soir: "🌙 Soir (18h - 00h)"
 };
 
+function getSlotPosterCandidates(dayNumber, slot) {
+    if (!Object.prototype.hasOwnProperty.call(SLOT_ORDER, slot)) return [];
+
+    const dayNames = [...new Set([String(dayNumber), String(dayNumber).padStart(2, "0")])];
+    return dayNames.map((dayName) => `../img/events/${dayName}-${slot}.jpg`);
+}
 
 // Calcule la date de l'événement (1er au 19 déc 2026) et sa date d'activation (7 jours avant)
 function getDaySchedule(dayNumber) {
@@ -78,6 +79,9 @@ function openDayModal(dayNumber, dayEvents, isUnlocked, unlockDate) {
                 </div>
                 <div class="slot-details-drawer">
                     <p class="slot-desc">${ev.description || "Plus d'informations très bientôt sur @chau7.n7 !"}</p>
+                    <div class="slot-poster-frame" hidden>
+                        <img class="slot-poster" loading="lazy">
+                    </div>
                     <div class="slot-meta-grid">
                         <span>📍 <strong>Lieu :</strong> ${ev.location || "Campus ENSEEIHT"}</span>
                         <span>📅 <strong>Date :</strong> ${ev.event_date || `2026-12-${String(dayNumber).padStart(2, "0")}`}</span>
@@ -91,11 +95,36 @@ function openDayModal(dayNumber, dayEvents, isUnlocked, unlockDate) {
     `;
 
     // Rend chaque événement cliquable pour déplier/replier ses détails complets
-    container.querySelectorAll(".clickable-event").forEach((card) => {
+    container.querySelectorAll(".clickable-event").forEach((card, index) => {
         card.addEventListener("click", () => {
             const wasOpen = card.classList.contains("expanded");
             container.querySelectorAll(".clickable-event").forEach((c) => c.classList.remove("expanded"));
-            if (!wasOpen) card.classList.add("expanded");
+            if (wasOpen) return;
+
+            card.classList.add("expanded");
+            if (card.dataset.posterChecked === "true") return;
+            card.dataset.posterChecked = "true";
+
+            const posterFrame = card.querySelector(".slot-poster-frame");
+            if (!posterFrame) return;
+            const poster = posterFrame.querySelector(".slot-poster");
+            const candidates = getSlotPosterCandidates(dayNumber, sorted[index].slot);
+            let candidateIndex = 0;
+
+            poster.alt = `Visuel de l'événement ${sorted[index].title || "Chau7"}`;
+            poster.onload = () => { posterFrame.hidden = false; };
+            poster.onerror = () => {
+                if (candidateIndex < candidates.length) {
+                    poster.src = candidates[candidateIndex++];
+                } else {
+                    posterFrame.remove();
+                }
+            };
+            if (candidates.length > 0) {
+                poster.src = candidates[candidateIndex++];
+            } else {
+                posterFrame.remove();
+            }
         });
     });
 
@@ -109,7 +138,7 @@ async function loadAdventCalendar() {
 
     const { data: eventsData, error } = await supabaseCal
         .from("advent_events")
-        .select("day_number, slot, event_date, title, description, location, points_hint, is_revealed");
+        .select("day_number, slot, event_date, title, description, location, points_hint");
 
     const eventsByDay = {};
     if (!error && eventsData) {
@@ -125,10 +154,8 @@ async function loadAdventCalendar() {
     for (let day = 1; day <= 19; day++) {
         const { eventDate, unlockDate } = getDaySchedule(day);
         const dayEvents = eventsByDay[day] || [];
-        const hasRevealedEvent = dayEvents.some((e) => e.is_revealed === true);
 
-        // Règle : actif 1 semaine (7 jours) avant le jour J, ou si is_revealed = true, ou si jour d'aperçu
-        const isUnlocked = (now >= unlockDate) || hasRevealedEvent || (day === PREVIEW_ACTIVE_DAY);
+        const isUnlocked = now >= unlockDate;
         const isToday = now.toDateString() === eventDate.toDateString();
 
         const card = document.createElement("article");
@@ -168,8 +195,10 @@ async function loadAdventCalendar() {
                     <span class="day-date">${day} déc.</span>
                 </div>
                 <div class="day-illustration">${sockSvg}</div>
-                <div class="day-title">Actif dès le ${unlockShort}</div>
-                <span class="lock-badge" title="Déblocage 7 jours avant">🔒</span>
+                <div class="day-unlock-row">
+                    <div class="day-title">Ouverture le ${unlockShort}</div>
+                    <span class="lock-badge" title="Déblocage 7 jours avant">🔒</span>
+                </div>
             `;
         }
 

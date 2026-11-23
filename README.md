@@ -1,8 +1,8 @@
-﻿# 🎄 Calendrier de l'Avent Chau7 - Toulouse INP-N7 🎁
+﻿# Calendrier de l'Avent Chau7 - Toulouse INP-N7
 
-Bienvenue sur le projet du **Calendrier de l'Avent** conçu spécialement pour la pré-liste étudiante **Chau7** de l'ENSEEIHT ! 🎅✨
+Bienvenue sur le projet du **Calendrier de l'Avent** conçu spécialement pour la pré-liste étudiante **Chau7** de l'ENSEEIHT ! 
 
-Ce projet a été imaginé et développé pour animer la vie étudiante de notre école avant les fêtes de fin d'année. L'objectif est simple : proposer chaque jour une surprise, un événement ou un défi à nos étudiants, tout en s'amusant à travers un système interactif de points et de classement ! 🏆
+Ce projet a été imaginé et développé pour animer la vie étudiante de notre école avant les fêtes de fin d'année. L'objectif est simple : proposer chaque jour une surprise, un événement ou un défi à nos étudiants, tout en s'amusant à travers un système interactif de points et de classement ! 
 
 ---
 

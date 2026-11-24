@@ -2,7 +2,7 @@ const supabaseCal = window.supabaseClient;
 
 // ⚠️ Permet d'activer uniquement le Jour 1 dès aujourd'hui pour visualiser le rendu débloqué.
 // Passe cette variable à `null` une fois les tests terminés pour n'utiliser que la règle J-7.
-const PREVIEW_ACTIVE_DAY = 3;
+const PREVIEW_ACTIVE_DAY = null;
 
 const SLOT_ORDER = { matin: 1, midi: 2, aprem: 3, soir: 4 };
 const SLOT_LABELS = {

@@ -297,8 +297,22 @@ if (loginForm) {
         const email = document.getElementById("email").value.trim().toLowerCase();
         const password = document.getElementById("password").value;
 
+        const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+        if (!turnstileToken) {
+            showAuthAlert("auth-message", "Veuillez valider la vérification anti-robot.", "error");
+            btn.disabled = false;
+            btn.textContent = "Se connecter 🧦";
+            return;
+        }
+
         try {
-            const { error } = await db.auth.signInWithPassword({ email, password });
+            const { error } = await db.auth.signInWithPassword({
+                email,
+                password,
+                options: {
+                    captchaToken: turnstileToken
+                }
+            });
 
             if (error) {
                 let msg = `Erreur : ${error.message}`;

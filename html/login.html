@@ -34,7 +34,12 @@
         <h2>🎅 Connexion</h2>
         <p class="subtitle">Accède à ta chaussette et tes points Chau7</p>
 
-        <div id="auth-message" class="alert-box"></div>
+                <div id="auth-message" class="alert-box"></div>
+
+        <div id="resend-box" style="display:none; margin-bottom:1rem; text-align:center;">
+            <p style="font-size:0.85rem; margin-bottom:0.5rem;">Tu n'as pas reçu le mail de confirmation ?</p>
+            <button type="button" id="btn-resend" class="btn-secondary">Renvoyer l'email de confirmation 📧</button>
+        </div>
 
         <form id="login-form">
             <label for="email">Adresse email</label>

@@ -314,12 +314,17 @@ if (loginForm) {
                 }
             });
 
-            if (error) {
+                        if (error) {
                 let msg = `Erreur : ${error.message}`;
+                const resendBox = document.getElementById("resend-box");
                 if (error.message.includes("Email not confirmed")) {
                     msg = "Compte non confirmé : clique sur le lien reçu par mail avant de te connecter.";
-                } else if (error.message.includes("Invalid login credentials")) {
-                    msg = "Email ou mot de passe incorrect.";
+                    if (resendBox) resendBox.style.display = "block";
+                } else {
+                    if (resendBox) resendBox.style.display = "none";
+                    if (error.message.includes("Invalid login credentials")) {
+                        msg = "Email ou mot de passe incorrect.";
+                    }
                 }
                 showAuthAlert("auth-message", msg, "error");
                 return;
@@ -336,7 +341,40 @@ if (loginForm) {
     });
 }
 
-// 4. Déconnexion
+// 4. Renvoi de l'email de confirmation (login.html)
+const resendBtn = document.getElementById("btn-resend");
+if (resendBtn) {
+    resendBtn.addEventListener("click", async () => {
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        if (!email) {
+            showAuthAlert("auth-message", "Saisis d'abord ton adresse email dans le formulaire.", "error");
+            return;
+        }
+        resendBtn.disabled = true;
+        resendBtn.textContent = "Envoi en cours...";
+        try {
+            const { error } = await db.auth.resend({
+                type: "signup",
+                email,
+                options: {
+                    captchaToken: document.querySelector('[name="cf-turnstile-response"]')?.value
+                }
+            });
+            if (error) {
+                showAuthAlert("auth-message", `Erreur lors du renvoi : ${error.message}`, "error");
+            } else {
+                showAuthAlert("auth-message", "Email de confirmation renvoyé ! Vérifie ta boîte de réception (et les spams). 📧", "success");
+            }
+        } catch (err) {
+            showAuthAlert("auth-message", "Erreur réseau lors du renvoi de l'email.", "error");
+        } finally {
+            resendBtn.disabled = false;
+            resendBtn.textContent = "Renvoyer l'email de confirmation 📧";
+        }
+    });
+}
+
+// 5. Déconnexion
 const logoutBtn = document.getElementById("btn-logout");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", async (e) => {

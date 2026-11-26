@@ -341,7 +341,7 @@ if (loginForm) {
     });
 }
 
-// 4. Renvoi de l'email de confirmation (login.html)
+/// 4. Renvoi de l'email de confirmation (login.html)
 const resendBtn = document.getElementById("btn-resend");
 if (resendBtn) {
     resendBtn.addEventListener("click", async () => {
@@ -374,7 +374,124 @@ if (resendBtn) {
     });
 }
 
-// 5. Déconnexion
+// 5. Mot de passe oublié (login.html)
+const forgotBtn = document.getElementById("btn-forgot-password");
+if (forgotBtn) {
+    forgotBtn.addEventListener("click", async () => {
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        if (!email) {
+            showAuthAlert("auth-message", "Saisis d'abord ton adresse email dans le formulaire, puis clique sur 'Mot de passe oublié'.", "error");
+            return;
+        }
+        forgotBtn.disabled = true;
+        forgotBtn.textContent = "Envoi en cours...";
+        try {
+            const { error } = await db.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + "/html/profile.html",
+                captchaToken: document.querySelector('[name="cf-turnstile-response"]')?.value
+            });
+            if (error) {
+                showAuthAlert("auth-message", `Erreur : ${error.message}`, "error");
+            } else {
+                showAuthAlert("auth-message", "Email de réinitialisation envoyé ! Vérifie ta boîte de réception (et les spams). 🔑", "success");
+            }
+        } catch (err) {
+            showAuthAlert("auth-message", "Erreur réseau lors de l'envoi.", "error");
+        } finally {
+            forgotBtn.disabled = false;
+            forgotBtn.textContent = "Mot de passe oublié ? 🔑";
+        }
+    });
+}
+
+// 6. Changement de mot de passe + email (profile.html)
+const btnChangePw = document.getElementById("btn-change-password");
+const btnChangeEmail = document.getElementById("btn-change-email");
+const accountForm = document.getElementById("account-form");
+const passwordFields = document.getElementById("password-fields");
+const emailFields = document.getElementById("email-fields");
+const profileMessage = document.getElementById("profile-message");
+
+function showProfileMsg(text, type) {
+    if (!profileMessage) return;
+    profileMessage.textContent = text;
+    profileMessage.className = `profile-message visible ${type}`;
+}
+
+if (btnChangePw && accountForm) {
+    btnChangePw.addEventListener("click", () => {
+        const opening = accountForm.style.display === "none";
+        accountForm.style.display = opening ? "block" : "none";
+        passwordFields.style.display = opening ? "block" : "none";
+        emailFields.style.display = "none";
+    });
+}
+
+if (btnChangeEmail && accountForm) {
+    btnChangeEmail.addEventListener("click", () => {
+        const opening = accountForm.style.display === "none";
+        accountForm.style.display = opening ? "block" : "none";
+        emailFields.style.display = opening ? "block" : "none";
+        passwordFields.style.display = "none";
+    });
+}
+
+const btnSavePw = document.getElementById("btn-save-password");
+if (btnSavePw) {
+    btnSavePw.addEventListener("click", async () => {
+        const newPw = document.getElementById("new-password").value;
+        if (!newPw || newPw.length < 6) {
+            showProfileMsg("Le mot de passe doit faire au moins 6 caractères.", "error");
+            return;
+        }
+        btnSavePw.disabled = true;
+        btnSavePw.textContent = "Enregistrement...";
+        try {
+            const { error } = await db.auth.updateUser({ password: newPw });
+            if (error) {
+                showProfileMsg(`Erreur : ${error.message}`, "error");
+            } else {
+                showProfileMsg("Mot de passe modifié avec succès ! 🔑", "success");
+                document.getElementById("new-password").value = "";
+                accountForm.style.display = "none";
+            }
+        } catch (err) {
+            showProfileMsg("Erreur réseau lors du changement de mot de passe.", "error");
+        } finally {
+            btnSavePw.disabled = false;
+            btnSavePw.textContent = "Enregistrer le nouveau mot de passe";
+        }
+    });
+}
+
+const btnSaveEmail = document.getElementById("btn-save-email");
+if (btnSaveEmail) {
+    btnSaveEmail.addEventListener("click", async () => {
+        const newEmail = document.getElementById("new-email").value.trim().toLowerCase();
+        if (!newEmail || !newEmail.includes("@")) {
+            showProfileMsg("Saisis une adresse e-mail valide.", "error");
+            return;
+        }
+        btnSaveEmail.disabled = true;
+        btnSaveEmail.textContent = "Envoi en cours...";
+        try {
+            const { error } = await db.auth.updateUser({ email: newEmail });
+            if (error) {
+                showProfileMsg(`Erreur : ${error.message}`, "error");
+            } else {
+                showProfileMsg("Un email de confirmation a été envoyé à ta nouvelle adresse. Clique sur le lien pour valider le changement. 📧", "success");
+                document.getElementById("new-email").value = "";
+            }
+        } catch (err) {
+            showProfileMsg("Erreur réseau lors du changement d'email.", "error");
+        } finally {
+            btnSaveEmail.disabled = false;
+            btnSaveEmail.textContent = "Envoyer la confirmation à la nouvelle adresse";
+        }
+    });
+}
+
+// 7. Déconnexion
 const logoutBtn = document.getElementById("btn-logout");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", async (e) => {

@@ -222,9 +222,17 @@ if (registerForm) {
         const prenom = document.getElementById("prenom").value.trim();
         const nom = document.getElementById("nom").value.trim();
         const pseudo = document.getElementById("pseudo").value.trim();
-        const filiere = document.getElementById("filiere").value;
+                const filiere = document.getElementById("filiere").value;
         const email = document.getElementById("email").value.trim().toLowerCase();
         const password = document.getElementById("password").value;
+
+        const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+        if (!turnstileToken) {
+            showAuthAlert("auth-message", "Veuillez valider la vérification anti-robot.", "error");
+            btn.disabled = false;
+            btn.textContent = "S'inscrire 🎄";
+            return;
+        }
 
         try {
             const { data: existingPseudo } = await db
@@ -242,6 +250,7 @@ if (registerForm) {
                 email,
                 password,
                 options: {
+                    captchaToken: turnstileToken,
                     data: {
                         prenom,
                         nom,

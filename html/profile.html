@@ -293,10 +293,28 @@
                     <div class="profile-detail"><span>Prochain objectif</span><strong>Garder ta série active ✨</strong></div>
                 </div>
 
-                <div class="checkin-panel">
+                                <div class="checkin-panel">
                     <h3>Le rendez-vous du jour</h3>
                     <p>Valide ton passage quotidien pour gagner des points et faire grandir ta série.</p>
                     <button id="btn-checkin" class="btn-checkin" type="button" disabled>Chargement...</button>
+                </div>
+
+                <div class="checkin-panel" style="margin-top:1rem;">
+                    <h3>🔐 Sécurité du compte</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:0.6rem; justify-content:center; margin-top:0.75rem;">
+                        <button type="button" id="btn-change-password" class="btn-secondary">🔑 Changer mon mot de passe</button>
+                        <button type="button" id="btn-change-email" class="btn-secondary">📧 Changer mon adresse e-mail</button>
+                    </div>
+                    <div id="account-form" style="display:none; margin-top:1rem;">
+                        <div id="password-fields" style="display:none;">
+                            <input type="password" id="new-password" placeholder="Nouveau mot de passe (min. 6 caractères)" minlength="6" required>
+                            <button type="button" id="btn-save-password" class="btn-checkin" style="max-width:100%;">Enregistrer le nouveau mot de passe</button>
+                        </div>
+                        <div id="email-fields" style="display:none;">
+                            <input type="email" id="new-email" placeholder="Nouvelle adresse e-mail" required>
+                            <button type="button" id="btn-save-email" class="btn-checkin" style="max-width:100%;">Envoyer la confirmation à la nouvelle adresse</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

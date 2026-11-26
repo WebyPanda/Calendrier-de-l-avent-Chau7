@@ -755,6 +755,48 @@ button:hover, .btn-primary:hover {
     border: 1px solid #bbf7d0;
 }
 
+.btn-secondary {
+    width: auto;
+    padding: 0.55rem 1.1rem;
+    background: var(--pine);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-secondary:hover {
+    background: var(--pine-light);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.link-btn {
+    width: auto;
+    background: none;
+    border: none;
+    color: var(--pine);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    padding: 0.3rem 0;
+    display: inline-block;
+    margin-top: 0.3rem;
+}
+
+.link-btn:hover {
+    color: var(--red);
+}
+
 /* --- Modale --- */
 .modal-backdrop {
     display: none;
